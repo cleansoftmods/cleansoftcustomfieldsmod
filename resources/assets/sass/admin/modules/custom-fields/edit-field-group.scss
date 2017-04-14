@@ -1,6 +1,9 @@
+@import "../../../../../../../assets-management/resources/assets/sass/mixins/mixins";
+
 /*Custom fields*/
 .line-group-container {
     width      : 100%;
+    overflow: auto;
     .line-group {
         width : 700px;
         &:before {
@@ -104,6 +107,32 @@
     }
     .item-details {
         display : none;
+        .line {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            .clearfix {
+                display : none;
+            }
+            .col-xs-3,
+            .col-xs-9 {
+                float : none;
+            }
+            .col-xs-9 h5 {
+                display : none;
+            }
+            .col-xs-9 .col-xs-9 h5 {
+                display : block;
+            }
+        }
+        h5 {
+            font-weight : 700;
+        }
+    }
+    .field-column {
+        @include clearfix;
     }
     li.active {
         > .item-details {

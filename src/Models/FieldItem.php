@@ -9,7 +9,16 @@ class FieldItem extends BaseModel implements FieldItemModelContract
 
     protected $primaryKey = 'id';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'field_group_id',
+        'parent_id',
+        'order',
+        'title',
+        'slug',
+        'type',
+        'instructions',
+        'options',
+    ];
 
     public $timestamps = false;
 

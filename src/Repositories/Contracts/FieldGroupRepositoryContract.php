@@ -29,4 +29,14 @@ interface FieldGroupRepositoryContract
      * @return bool
      */
     public function deleteFieldGroup($id);
+
+    /**
+     * @param int $groupId
+     * @param null $parentId
+     * @param bool $withValue
+     * @param null $morphClass
+     * @param null $morphId
+     * @return array
+     */
+    public function getFieldGroupItems($groupId, $parentId = null, $withValue = false, $morphClass = null, $morphId = null);
 }

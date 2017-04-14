@@ -1,5 +1,6 @@
 <?php namespace WebEd\Base\CustomFields\Repositories\Contracts;
 
+use Illuminate\Support\Collection;
 use WebEd\Base\Models\Contracts\BaseModelContract;
 
 interface FieldItemRepositoryContract
@@ -29,4 +30,18 @@ interface FieldItemRepositoryContract
      * @return bool
      */
     public function deleteFieldItem($id);
+
+    /**
+     * @param $groupId
+     * @param null $parentId
+     * @return Collection
+     */
+    public function getGroupItems($groupId, $parentId = null);
+
+    /**
+     * @param int|null|BaseModelContract $id
+     * @param array $data
+     * @return int|null
+     */
+    public function updateWithUniqueSlug($id, array $data);
 }

@@ -1,4 +1,3 @@
-// Init
 class ManageCustomFields {
     constructor() {
         this.$body = $('body');

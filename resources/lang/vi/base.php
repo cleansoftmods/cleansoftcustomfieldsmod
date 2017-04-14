@@ -10,6 +10,10 @@ return [
     'all_field_groups' => 'Tất cả nhóm trường tùy chỉnh',
 
     'form' => [
+        'create_field_group' => 'Thêm nhóm trường mới',
+        'edit_field_group' => 'Chỉnh sửa trường tùy chỉnh',
+        'field_items_information' => 'Thiết đặt các mục con của trường này',
+
         'repeater_fields' => 'Bộ lặp',
         'add_field' => 'Thêm trường',
         'remove_field' => 'Xóa trường này',

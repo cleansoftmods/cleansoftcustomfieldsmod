@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use WebEd\Base\CustomFields\Http\DataTables\FieldGroupsListDataTable;
+use WebEd\Base\CustomFields\Http\Requests\CreateFieldGroupRequest;
+use WebEd\Base\CustomFields\Http\Requests\UpdateFieldGroupRequest;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
 use WebEd\Base\Http\Controllers\BaseAdminController;
@@ -136,24 +138,19 @@ class CustomFieldController extends BaseAdminController
     {
         do_action(BASE_ACTION_BEFORE_CREATE, WEBED_CUSTOM_FIELDS, 'create.get');
 
-        $this->assets
-            ->addJavascripts([
-                'jquery-ckeditor'
-            ]);
-
-        $this->setPageTitle(trans('webed-custom-fields::base.page_title'));
-        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.page_title'));
+        $this->setPageTitle(trans('webed-custom-fields::base.form.create_field_group'));
+        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.form.create_field_group'));
 
         return do_filter(BASE_FILTER_CONTROLLER, $this, WEBED_CUSTOM_FIELDS, 'create.get')->viewAdmin('create');
     }
 
-    public function postCreate(YourCreateFormRequest $request)
+    public function postCreate(CreateFieldGroupRequest $request)
     {
         do_action(BASE_ACTION_BEFORE_CREATE, WEBED_CUSTOM_FIELDS, 'create.post');
 
         $data['created_by'] = $this->loggedInUser->id;
 
-        $result = $this->repository->create($request->all());
+        $result = $this->repository->createFieldGroup($request->get('field_group', []));
 
         do_action(BASE_ACTION_AFTER_CREATE, WEBED_CUSTOM_FIELDS, $result);
 
@@ -169,10 +166,10 @@ class CustomFieldController extends BaseAdminController
         }
 
         if ($this->request->has('_continue_edit')) {
-            return redirect()->to(route('admin::your-module.edit.get', ['id' => $result]));
+            return redirect()->to(route('admin::custom-fields.field-group.edit.get', ['id' => $result]));
         }
 
-        return redirect()->to(route('admin::your-module.index.get'));
+        return redirect()->to(route('admin::custom-fields.index.get'));
     }
 
     /**
@@ -193,15 +190,12 @@ class CustomFieldController extends BaseAdminController
 
         $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.get');
 
-        $this->assets
-            ->addJavascripts([
-                'jquery-ckeditor'
-            ]);
-
-        $this->setPageTitle(trans('webed-custom-fields::base.edit_item') . ' #' . $item->id);
-        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.edit_item'));
+        $this->setPageTitle(trans('webed-custom-fields::base.form.edit_field_group') . ' #' . $item->id);
+        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.form.edit_field_group'));
 
         $this->dis['object'] = $item;
+
+        $this->dis['customFieldItems'] = json_encode($this->repository->getFieldGroupItems($id));
 
         return do_filter(BASE_FILTER_CONTROLLER, $this, WEBED_CUSTOM_FIELDS, 'edit.get', $id)->viewAdmin('edit');
     }
@@ -210,13 +204,13 @@ class CustomFieldController extends BaseAdminController
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function postEdit(YourUpdateFormRequest $request, $id)
+    public function postEdit(UpdateFieldGroupRequest $request, $id)
     {
         $item = $this->repository->find($id);
 
         if (!$item) {
             flash_messages()
-                ->addMessages(trans('webed-custom-fields::base.item_not_exists'), 'danger')
+                ->addMessages(trans('webed-core::base.item_not_exists'), 'danger')
                 ->showMessagesOnSession();
 
             return redirect()->back();
@@ -224,7 +218,7 @@ class CustomFieldController extends BaseAdminController
 
         $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.post');
 
-        $result = $this->repository->update($item, $request->all());
+        $result = $this->repository->updateFieldGroup($item, $request->get('field_group'));
 
         do_action(BASE_ACTION_AFTER_UPDATE, WEBED_CUSTOM_FIELDS, $id, $result);
 
@@ -239,7 +233,7 @@ class CustomFieldController extends BaseAdminController
             return redirect()->back();
         }
 
-        return redirect()->to(route('admin::your-module.index.get'));
+        return redirect()->to(route('admin::custom-fields.index.get'));
     }
 
     /**

@@ -14,18 +14,18 @@
 
 @section('content')
     {!! Form::open(['class' => 'js-validate-form form-update-field-group']) !!}
-    <textarea name="rules"
+    <textarea name="field_group[rules]"
               id="custom_fields_rules"
               class="form-control hidden"
-              style="display: none !important;">{!! ((isset($object->rules) && $object->rules) ? $object->rules : '[]') !!}</textarea>
-    <textarea name="group_items"
+              style="display: none !important;">{!! old('field_group.rules', '[]') !!}</textarea>
+    <textarea name="field_group[group_items]"
               id="custom_fields"
               class="form-control hidden"
-              style="display: none !important;">{!! $customFieldItems or '[]' !!}</textarea>
-    <textarea name="deleted_items"
+              style="display: none !important;">{!! old('field_group.group_items', '[]') !!}</textarea>
+    <textarea name="field_group[deleted_items]"
               id="deleted_items"
               class="form-control hidden"
-              style="display: none !important;"></textarea>
+              style="display: none !important;">{!! old('field_group.deleted_items', '[]') !!}</textarea>
     <div class="row">
         <div class="col-lg-6">
             <div class="box box-primary">
@@ -46,7 +46,7 @@
                         <input required type="text"
                                name="field_group[title]"
                                class="form-control"
-                               value="{{ $object->title or '' }}"
+                               value="{{ old('field_group.title') }}"
                                autocomplete="off">
                     </div>
                     <div class="form-group">
@@ -65,7 +65,7 @@
                         <input required type="number"
                                name="field_group[order]"
                                class="form-control"
-                               value="{{ $object->order or 0 }}"
+                               value="{{ old('field_group.order', 0) }}"
                                autocomplete="off">
                     </div>
                 </div>
@@ -105,7 +105,7 @@
         <div class="box-header with-border">
             <h3 class="box-title">
                 <i class="icon-layers font-dark"></i>
-                Field group information
+                {{ trans('webed-custom-fields::base.form.field_items_information') }}
             </h3>
         </div>
         <div class="box-body">

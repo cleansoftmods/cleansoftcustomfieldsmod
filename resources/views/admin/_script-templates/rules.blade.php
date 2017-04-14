@@ -2,7 +2,7 @@
     <div class="line rule-line mb10">
         <select class="form-control pull-left rule-a">
             @foreach($ruleGroups as $key => $row)
-                <optgroup label="{{ $key or '' }}">
+                <optgroup label="{{ trans('webed-custom-fields::rules.groups.' . $key) }}">
                     @foreach($row['items'] as $item)
                         <option value="{{ $item['slug'] or '' }}">{{ $item['title'] or '' }}</option>
                     @endforeach

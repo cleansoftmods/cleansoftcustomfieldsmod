@@ -42,7 +42,7 @@ class BootstrapModuleMiddleware
     protected function registerUsersFields()
     {
         custom_field_rules()
-            ->registerRule('other', 'Logged in user', 'logged_in_user', function () {
+            ->registerRule('other', trans('webed-custom-fields::rules.logged_in_user'), 'logged_in_user', function () {
                 $userRepository = app(\WebEd\Base\Users\Repositories\Contracts\UserRepositoryContract::class);
 
                 $users = $userRepository->get();
@@ -54,7 +54,7 @@ class BootstrapModuleMiddleware
 
                 return $userArr;
             })
-            ->registerRule('other', 'Logged in user has role', 'logged_in_user_has_role', function () {
+            ->registerRule('other', trans('webed-custom-fields::rules.logged_in_user_has_role'), 'logged_in_user_has_role', function () {
                 $repository = app(\WebEd\Base\ACL\Repositories\Contracts\RoleRepositoryContract::class);
 
                 $roles = $repository->get();
@@ -71,8 +71,8 @@ class BootstrapModuleMiddleware
     protected function registerPagesFields()
     {
         custom_field_rules()
-            ->registerRule('basic', 'Page template', 'page_template', get_templates('Page'))
-            ->registerRule('basic', 'Page', 'page', function () {
+            ->registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', get_templates('Page'))
+            ->registerRule('basic', trans('webed-custom-fields::rules.page'), 'page', function () {
                 $pageRepository = app(\WebEd\Base\Pages\Repositories\Contracts\PageRepositoryContract::class);
                 $pages = $pageRepository->get();
                 $pageArray = [];
@@ -81,7 +81,7 @@ class BootstrapModuleMiddleware
                 }
                 return $pageArray;
             })
-            ->registerRule('other', 'Model name', 'model_name', [
+            ->registerRule('other', trans('webed-custom-fields::rules.model_name'), 'model_name', [
                 'page' => 'Page'
             ]);
     }

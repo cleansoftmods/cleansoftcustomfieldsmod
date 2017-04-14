@@ -13,67 +13,57 @@
 @endsection
 
 @section('content')
-    {!! Form::open(['class' => 'js-validate-form form-update-field-group', 'url' => route('admin::custom-fields.field-group.edit.post', ['id' => $object->id])]) !!}
-    <textarea name="rules"
+    {!! Form::open(['class' => 'js-validate-form form-update-field-group']) !!}
+    <textarea name="field_group[rules]"
               id="custom_fields_rules"
               class="form-control hidden"
-              style="display: none !important;">{!! ((isset($object->rules) && $object->rules) ? $object->rules : '[]') !!}</textarea>
-    <textarea name="group_items"
+              style="display: none !important;">{!! $object->rules !!}</textarea>
+    <textarea name="field_group[group_items]"
               id="custom_fields"
               class="form-control hidden"
               style="display: none !important;">{!! $customFieldItems or '[]' !!}</textarea>
-    <textarea name="deleted_items"
+    <textarea name="field_group[deleted_items]"
               id="deleted_items"
               class="form-control hidden"
-              style="display: none !important;"></textarea>
+              style="display: none !important;">{!! $deletedItems or '[]' !!}</textarea>
     <div class="row">
         <div class="col-lg-6">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">
-                        <i class="icon-layers font-dark"></i>
-                        Basic information
-                    </h3>
+                    <h3 class="box-title">{{ trans('webed-core::base.form.basic_info') }}</h3>
                     <div class="box-tools">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                class="fa fa-minus"></i>
+                                    class="fa fa-minus"></i>
                         </button>
                     </div>
                 </div>
                 <div class="box-body">
                     <div class="form-group">
                         <label class="control-label">
-                            <b>Title</b>
+                            <b>{{ trans('webed-core::base.form.title') }}</b>
                             <span class="required"> * </span>
                         </label>
                         <input required type="text"
-                               name="title"
+                               name="field_group[title]"
                                class="form-control"
                                value="{{ $object->title or '' }}"
                                autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label class="control-label">
-                            <b>Status</b>
-                            <span class="required"> * </span>
+                            <b>{{ trans('webed-core::base.form.status') }}</b>
                         </label>
-                        <select name="status" class="form-control">
-                            <option
-                                value="activated" {{ (isset($object) && $object->status == 'activated') ? 'selected' : '' }}>
-                                Activated
-                            </option>
-                            <option
-                                value="disabled" {{ (isset($object) && $object->status == 'disabled') ? 'selected' : '' }}>
-                                Disabled
-                            </option>
-                        </select>
+                        {!! form()->select('field_group[status]', [
+                           'activated' => trans('webed-core::base.status.activated'),
+                            'disabled' => trans('webed-core::base.status.disabled'),
+                        ], $object->status, ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group">
                         <label class="control-label">
-                            <b>Sort order</b>
+                            <b>{{ trans('webed-core::base.form.order') }}</b>
                         </label>
-                        <input required type="text"
-                               name="order"
+                        <input required type="number"
+                               name="field_group[order]"
                                class="form-control"
                                value="{{ $object->order or 0 }}"
                                autocomplete="off">
@@ -86,26 +76,24 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">
                         <i class="icon-layers font-dark"></i>
-                        Rules
+                        {{ trans('webed-custom-fields::base.form.rules.rules') }}
                     </h3>
                     <div class="box-tools">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                class="fa fa-minus"></i>
+                                    class="fa fa-minus"></i>
                         </button>
                     </div>
                 </div>
                 <div class="box-body">
                     <div class="custom-fields-rules">
-                        <label class="control-label">
-                            <b>Rules</b>
-                            <span class="required"> * </span>
-                            <span class="help-block">Show this field group if</span>
+                        <label class="control-label mb15">
+                            <b>{{ trans('webed-custom-fields::base.form.rules.rules_helper') }}</b>
                         </label>
                         <div class="line-group-container"></div>
                         <div class="line">
-                            <p class="mt20"><b>Or</b></p>
+                            <p class="mt20"><b>{{ trans('webed-custom-fields::base.form.rules.or') }}</b></p>
                             <a class="location-add-rule-or location-add-rule btn btn-info" href="#">
-                                Add rule group
+                                {{ trans('webed-custom-fields::base.form.rules.add_rule_group') }}
                             </a>
                         </div>
                     </div>
@@ -117,7 +105,7 @@
         <div class="box-header with-border">
             <h3 class="box-title">
                 <i class="icon-layers font-dark"></i>
-                Field group information
+                {{ trans('webed-custom-fields::base.form.field_items_information') }}
             </h3>
         </div>
         <div class="box-body">

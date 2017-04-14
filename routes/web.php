@@ -37,6 +37,6 @@ Route::group(['prefix' => $adminRoute . '/custom-fields'], function (Router $rou
         ->middleware('has-permission:edit-field-groups');
 
     $router->delete('/delete/{id}', 'CustomFieldController@deleteDelete')
-        ->name('admin::custom-fields.field-group.delete')
+        ->name('admin::custom-fields.field-group.delete.delete')
         ->middleware('has-permission:delete-field-groups');
 });

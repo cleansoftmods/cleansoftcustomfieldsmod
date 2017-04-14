@@ -32,14 +32,5 @@ class UninstallModuleServiceProvider extends ServiceProvider
     {
         acl_permission()
         ->unsetPermissionByModule($this->moduleAlias);
-
-        $this->dropSchema();
-    }
-
-    protected function dropSchema()
-    {
-        \Schema::dropIfExists('custom_fields');
-        \Schema::dropIfExists('field_items');
-        \Schema::dropIfExists('field_groups');
     }
 }
