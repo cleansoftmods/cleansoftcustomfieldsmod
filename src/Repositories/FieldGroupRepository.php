@@ -1,5 +1,6 @@
 <?php namespace WebEd\Base\CustomFields\Repositories;
 
+use Illuminate\Support\Collection;
 use WebEd\Base\CustomFields\Models\Contracts\CustomFieldModelContract;
 use WebEd\Base\CustomFields\Repositories\Contracts\CustomFieldRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldItemRepositoryContract;
@@ -25,6 +26,18 @@ class FieldGroupRepository extends EloquentBaseRepository implements FieldGroupR
 
         $this->fieldItemRepository = app(FieldItemRepositoryContract::class);
         $this->customFieldRepository = app(CustomFieldRepositoryContract::class);
+    }
+
+    /**
+     * @param array $condition
+     * @return Collection
+     */
+    public function getFieldGroups(array $condition = [])
+    {
+        return $this->model
+            ->where($condition)
+            ->orderBy('order', 'ASC')
+            ->get();
     }
 
     /**
@@ -89,7 +102,17 @@ class FieldGroupRepository extends EloquentBaseRepository implements FieldGroupR
      */
     public function createOrUpdateFieldGroup($id, array $data)
     {
-        return $this->createOrUpdate($id, $data);
+        $result = $this->createOrUpdate($id, $data);
+        if ($result) {
+            if (array_get($data, 'deleted_items')) {
+                $this->fieldItemRepository->deleteFieldItem(json_decode($data['deleted_items'], true));
+            }
+
+            if (array_get($data, 'group_items')) {
+                $this->editGroupItems(json_decode($data['group_items'], true), $result);
+            }
+        }
+        return $result;
     }
 
     /**

@@ -16,17 +16,10 @@ class CustomField extends BaseModel implements CustomFieldModelContract
         'type',
         'slug',
         'value',
+        'field_item_id',
     ];
 
     public $timestamps = false;
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
-     */
-    public function useCustomFields()
-    {
-        return $this->morphTo();
-    }
 
     /**
      * Get $this->resolved_value

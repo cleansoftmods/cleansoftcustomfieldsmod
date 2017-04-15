@@ -1,4 +1,8 @@
 <?php
+
+use WebEd\Base\CustomFields\Facades\CustomFieldSupportFacade;
+use WebEd\Base\CustomFields\Support\CustomFieldSupport;
+
 if (!function_exists('parse_custom_fields_raw_data')) {
     /**
      * @param $jsonString
@@ -22,61 +26,29 @@ if (!function_exists('parse_custom_fields_raw_data')) {
     }
 }
 
-if (!function_exists('custom_field_rules')) {
+if (!function_exists('add_custom_fields_rules_to_check')) {
     /**
-     * @return \WebEd\Base\CustomFields\Support\CustomFieldRules
-     */
-    function custom_field_rules()
-    {
-        return \WebEd\Base\CustomFields\Facades\CustomFieldRulesFacade::getFacadeRoot();
-    }
-}
-
-if (!function_exists('render_custom_fields')) {
-    /**
-     * @return \WebEd\Base\CustomFields\Support\RenderCustomFields
-     */
-    function render_custom_fields()
-    {
-        return \WebEd\Base\CustomFields\Facades\RenderCustomFieldsFacade::getFacadeRoot();
-    }
-}
-
-if (!function_exists('set_custom_field_rules')) {
-    /**
-     * @param array $rules
-     * @return mixed
-     */
-    function set_custom_field_rules(array $rules)
-    {
-        return render_custom_fields()->setRules($rules);
-    }
-}
-
-if (!function_exists('add_custom_field_rules')) {
-    /**
-     * @param array|string $ruleName
+     * @param string|array $ruleName
      * @param $value
-     * @return mixed
+     * @return CustomFieldSupport
      */
-    function add_custom_field_rules($ruleName, $value = null)
+    function add_custom_fields_rules_to_check($ruleName, $value = null)
     {
-        return render_custom_fields()->addRules($ruleName, $value);
+        return CustomFieldSupportFacade::addRule($ruleName, $value);
     }
 }
-
 
 if (!function_exists('get_custom_field_boxes')) {
     /**
      * @param string $modelName
      * @param int $modelId
-     * @return mixed
+     * @return array
      */
     function get_custom_field_boxes($modelName, $modelId)
     {
         if (is_object($modelName)) {
             $modelName = get_class($modelName);
         }
-        return render_custom_fields()->exportCustomFieldsData((string)$modelName, $modelId);
+        return CustomFieldSupportFacade::exportCustomFieldsData($modelName, $modelId);
     }
 }

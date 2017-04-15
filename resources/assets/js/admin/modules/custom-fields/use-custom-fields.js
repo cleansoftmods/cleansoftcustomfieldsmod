@@ -1,27 +1,32 @@
-let UseCustomFields = function ($) {
-    let $body = $('body'),
-        $window = $(window),
-        $document = $(document);
-    /**
-     * Where to show the custom field elements
-     */
-    let $_UPDATE_TO = $('#custom_fields_container');
-    /**
-     * Where to export json data when submit form
-     */
-    let $_EXPORT_TO = $('#custom_fields_json');
+class UseCustomFields {
+    constructor() {
+        this.$body = $('body');
 
-    /**
-     * Current field data
-     */
-    let CURRENT_DATA = json_decode($_EXPORT_TO.val(), []);
+        /**
+         * Where to show the custom field elements
+         */
+        this.$_UPDATE_TO = $('#custom_fields_container');
+        /**
+         * Where to export json data when submit form
+         */
+        this.$_EXPORT_TO = $('#custom_fields_json');
 
-    let handleCustomFields = function () {
+        this.CURRENT_DATA = Helpers.jsonDecode(this.$_EXPORT_TO.val(), []);
+
+        if (this.CURRENT_DATA) {
+            this.handleCustomFields();
+            this.exportData();
+        }
+    }
+
+    handleCustomFields() {
+        let _self = this;
+
         let repeaterFieldAdded = 0;
         /**
          * The html template of custom fields
          */
-        let fieldTemplate = {
+        let FIELD_TEMPLATE = {
             fieldGroup: $('#_render_customfield_field_group_template').html(),
             globalSkeleton: $('#_render_customfield_global_skeleton_template').html(),
             text: $('#_render_customfield_text_template').html(),
@@ -43,8 +48,8 @@ let UseCustomFields = function ($) {
         let initWYSIWYG = function ($element, type) {
             "use strict";
             let toolbar = type === 'basic' ? {
-                toolbar: [['mode', 'Source', 'Image', 'TextColor', 'BGColor', 'Styles', 'Format', 'Font', 'FontSize', 'CreateDiv', 'PageBreak', 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', 'RemoveFormat']]
-            } : {};
+                    toolbar: [['mode', 'Source', 'Image', 'TextColor', 'BGColor', 'Styles', 'Format', 'Font', 'FontSize', 'CreateDiv', 'PageBreak', 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', 'RemoveFormat']]
+                } : {};
             $element.ckeditor(toolbar);
 
             return $element;
@@ -52,7 +57,7 @@ let UseCustomFields = function ($) {
 
         let initCustomFieldsBoxes = function (boxes, $appendTo) {
             boxes.forEach(function (box, indexBox) {
-                let skeleton = fieldTemplate.globalSkeleton;
+                let skeleton = FIELD_TEMPLATE.globalSkeleton;
                 skeleton = skeleton.replace(/__type__/gi, box.type || '');
                 skeleton = skeleton.replace(/__title__/gi, box.title || '');
                 skeleton = skeleton.replace(/__instructions__/gi, box.instructions || '');
@@ -65,7 +70,7 @@ let UseCustomFields = function ($) {
         };
 
         let registerLine = function (box) {
-            let result = fieldTemplate[box.type],
+            let result = FIELD_TEMPLATE[box.type],
                 $wrapper = $('<div class="lcf-' + box.type + '-wrapper"></div>');
             $wrapper.data('lcf-registered-data', box);
             switch (box.type) {
@@ -93,7 +98,7 @@ let UseCustomFields = function ($) {
                 case 'file':
                     result = result.replace(/__value__/gi, box.value || box.options.defaultValue || '');
                     break;
-                case 'select':
+                case 'select': {
                     let $result = $(result);
                     let choices = parseChoices(box.options.selectChoices);
                     choices.forEach(function (choice, index) {
@@ -102,10 +107,11 @@ let UseCustomFields = function ($) {
                     $result.val(array_get(box, 'value', box.options.defaultValue));
                     $wrapper.append($result);
                     return $wrapper;
+                }
                     break;
-                case 'checkbox':
+                case 'checkbox': {
                     let choices = parseChoices(box.options.selectChoices);
-                    let boxValue = json_decode(box.value);
+                    let boxValue = Helpers.jsonDecode(box.value);
                     choices.forEach(function (choice, index) {
                         let template = result.replace(/__value__/gi, choice[0] || '');
                         template = template.replace(/__title__/gi, choice[1] || '');
@@ -113,8 +119,9 @@ let UseCustomFields = function ($) {
                         $wrapper.append($(template));
                     });
                     return $wrapper;
+                }
                     break;
-                case 'radio':
+                case 'radio': {
                     let choices = parseChoices(box.options.selectChoices);
                     let isChecked = false;
                     choices.forEach(function (choice, index) {
@@ -132,8 +139,9 @@ let UseCustomFields = function ($) {
                         $wrapper.find('input[type=radio]:first').prop('checked', true);
                     }
                     return $wrapper;
+                }
                     break;
-                case 'repeater':
+                case 'repeater': {
                     let $result = $(result);
                     $result.data('lcf-registered-data', box);
 
@@ -141,11 +149,13 @@ let UseCustomFields = function ($) {
                     $result.find('> .sortable-wrapper').sortable();
                     registerRepeaterItem(box.items, box.value || [], $result.find('> .field-group-items'));
                     return $result;
+                }
                     break;
-                case 'wysiwyg':
+                case 'wysiwyg': {
                     result = result.replace(/__value__/gi, box.value || '');
                     let $result = $(result);
                     return initWYSIWYG($result, box.options.wysiwygToolbar || 'basic');
+                }
                     break;
             }
             $wrapper.append($(result));
@@ -156,7 +166,7 @@ let UseCustomFields = function ($) {
             $appendTo.data('lcf-registered-data', items);
             data.forEach(function (dataItem, indexData) {
                 let indexCss = $appendTo.find('> .ui-sortable-handle').length + 1;
-                let result = fieldTemplate.repeaterItem;
+                let result = FIELD_TEMPLATE.repeaterItem;
                 result = result.replace(/__position__/gi, indexCss);
 
                 let $result = $(result);
@@ -173,7 +183,7 @@ let UseCustomFields = function ($) {
             data.forEach(function (item, index) {
                 repeaterFieldAdded++;
 
-                let result = fieldTemplate.repeaterFieldLine;
+                let result = FIELD_TEMPLATE.repeaterFieldLine;
                 result = result.replace(/__title__/gi, item.title || '');
                 result = result.replace(/__instructions__/gi, item.instructions || '');
 
@@ -202,7 +212,7 @@ let UseCustomFields = function ($) {
         /**
          * Remove field item
          */
-        $body.on('click', '.remove-field-line', function (event) {
+        this.$body.on('click', '.remove-field-line', function (event) {
             event.preventDefault();
             let current = $(this);
             current.parent().animate({
@@ -216,7 +226,7 @@ let UseCustomFields = function ($) {
         /**
          * Collapse field item
          */
-        $body.on('click', '.collapse-field-line', function (event) {
+        this.$body.on('click', '.collapse-field-line', function (event) {
             event.preventDefault();
             let current = $(this);
             current.toggleClass('collapsed-line');
@@ -225,7 +235,7 @@ let UseCustomFields = function ($) {
         /**
          * Add new repeater line
          */
-        $body.on('click', '.repeater-add-new-field', function (event) {
+        this.$body.on('click', '.repeater-add-new-field', function (event) {
             event.preventDefault();
             let $groupWrapper = $.extend(true, {}, $(this).prev('.field-group-items'));
             let registeredData = $groupWrapper.data('lcf-registered-data');
@@ -238,8 +248,8 @@ let UseCustomFields = function ($) {
         /**
          * Init data when page loaded
          */
-        CURRENT_DATA.forEach(function (group, indexGroup) {
-            let groupTemplate = fieldTemplate.fieldGroup;
+        this.CURRENT_DATA.forEach(function (group, indexGroup) {
+            let groupTemplate = FIELD_TEMPLATE.fieldGroup;
             groupTemplate = groupTemplate.replace(/__title__/gi, group.title || '');
 
             let $groupTemplate = $(groupTemplate);
@@ -248,11 +258,13 @@ let UseCustomFields = function ($) {
 
             $groupTemplate.data('lcf-field-group', group);
 
-            $_UPDATE_TO.append($groupTemplate);
+            _self.$_UPDATE_TO.append($groupTemplate);
         });
-    };
+    }
 
-    let exportData = function () {
+    exportData() {
+        let _self = this;
+
         let getFieldGroups = function () {
             let fieldGroups = [];
 
@@ -369,24 +381,14 @@ let UseCustomFields = function ($) {
             return customFieldData;
         };
 
-        $_EXPORT_TO.closest('form').on('submit', function (event) {
-            $_EXPORT_TO.val(JSON.stringify(getFieldGroups()));
+        _self.$_EXPORT_TO.closest('form').on('submit', function (event) {
+            _self.$_EXPORT_TO.val(JSON.stringify(getFieldGroups()));
         });
-    };
-
-    return {
-        init: function () {
-            if (typeof CURRENT_DATA === 'undefined') {
-                return;
-            }
-            handleCustomFields();
-            exportData();
-        }
     }
-}(jQuery);
+}
 
 (function ($) {
     $(document).ready(function () {
-        UseCustomFields.init();
+        new UseCustomFields();
     });
 })(jQuery);

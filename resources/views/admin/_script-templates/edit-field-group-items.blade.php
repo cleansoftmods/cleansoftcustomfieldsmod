@@ -1,4 +1,4 @@
-{!! custom_field_rules()->render() !!}
+{!! \WebEd\Base\CustomFields\Facades\CustomFieldSupportFacade::renderRules() !!}
 <script id="_options-repeater_template" type="text/x-custom-template">
     <div class="line" data-option="repeater">
         <div class="col-xs-3">

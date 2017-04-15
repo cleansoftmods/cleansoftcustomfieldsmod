@@ -1,6 +1,7 @@
 <?php namespace WebEd\Base\CustomFields\Http\Middleware;
 
 use \Closure;
+use WebEd\Base\CustomFields\Facades\CustomFieldSupportFacade;
 
 class BootstrapModuleMiddleware
 {
@@ -41,8 +42,7 @@ class BootstrapModuleMiddleware
 
     protected function registerUsersFields()
     {
-        custom_field_rules()
-            ->registerRule('other', trans('webed-custom-fields::rules.logged_in_user'), 'logged_in_user', function () {
+        CustomFieldSupportFacade::registerRule('other', trans('webed-custom-fields::rules.logged_in_user'), 'logged_in_user', function () {
                 $userRepository = app(\WebEd\Base\Users\Repositories\Contracts\UserRepositoryContract::class);
 
                 $users = $userRepository->get();
@@ -70,8 +70,7 @@ class BootstrapModuleMiddleware
 
     protected function registerPagesFields()
     {
-        custom_field_rules()
-            ->registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', get_templates('Page'))
+        CustomFieldSupportFacade::registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', get_templates('Page'))
             ->registerRule('basic', trans('webed-custom-fields::rules.page'), 'page', function () {
                 $pageRepository = app(\WebEd\Base\Pages\Repositories\Contracts\PageRepositoryContract::class);
                 $pages = $pageRepository->get();
@@ -82,15 +81,14 @@ class BootstrapModuleMiddleware
                 return $pageArray;
             })
             ->registerRule('other', trans('webed-custom-fields::rules.model_name'), 'model_name', [
-                'page' => 'Page'
+                'page' => WEBED_PAGES
             ]);
     }
 
     protected function registerBlogFields()
     {
         if (modules_management()->isActivated('webed-blog') && modules_management()->isInstalled('webed-blog')) {
-            custom_field_rules()
-                ->registerRuleGroup('blog')
+            CustomFieldSupportFacade::registerRuleGroup('blog')
                 ->registerRule('blog', 'Post template', 'blog.post_template', get_templates('Post'))
                 ->registerRule('blog', 'Category template', 'blog.category_template', get_templates('Category'))
                 ->registerRule('blog', 'Category', 'blog.category', function () {

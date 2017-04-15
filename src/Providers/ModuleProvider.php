@@ -60,6 +60,7 @@ class ModuleProvider extends ServiceProvider
 
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(RepositoryServiceProvider::class);
+        $this->app->register(HookServiceProvider::class);
 
         /**
          * @var Router $router
