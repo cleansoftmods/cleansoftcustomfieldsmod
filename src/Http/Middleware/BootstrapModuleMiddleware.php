@@ -43,17 +43,17 @@ class BootstrapModuleMiddleware
     protected function registerUsersFields()
     {
         CustomFieldSupportFacade::registerRule('other', trans('webed-custom-fields::rules.logged_in_user'), 'logged_in_user', function () {
-                $userRepository = app(\WebEd\Base\Users\Repositories\Contracts\UserRepositoryContract::class);
+            $userRepository = app(\WebEd\Base\Users\Repositories\Contracts\UserRepositoryContract::class);
 
-                $users = $userRepository->get();
+            $users = $userRepository->get();
 
-                $userArr = [];
-                foreach ($users as $user) {
-                    $userArr[$user->id] = $user->username . ' - ' . $user->email;
-                }
+            $userArr = [];
+            foreach ($users as $user) {
+                $userArr[$user->id] = $user->username . ' - ' . $user->email;
+            }
 
-                return $userArr;
-            })
+            return $userArr;
+        })
             ->registerRule('other', trans('webed-custom-fields::rules.logged_in_user_has_role'), 'logged_in_user_has_role', function () {
                 $repository = app(\WebEd\Base\ACL\Repositories\Contracts\RoleRepositoryContract::class);
 
@@ -72,13 +72,21 @@ class BootstrapModuleMiddleware
     {
         CustomFieldSupportFacade::registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', get_templates('Page'))
             ->registerRule('basic', trans('webed-custom-fields::rules.page'), 'page', function () {
-                $pageRepository = app(\WebEd\Base\Pages\Repositories\Contracts\PageRepositoryContract::class);
-                $pages = $pageRepository->get();
-                $pageArray = [];
-                foreach ($pages as $row) {
-                    $pageArray[$row->id] = $row->title;
-                }
-                return $pageArray;
+                $pages = get_pages([
+                    'select' => [
+                        'id', 'title'
+                    ],
+                    /*Ignore the filters*/
+                    'condition' => [],
+                    'order_by' => [
+                        'order' => 'ASC',
+                        'created_at' => 'DESC',
+                    ],
+                ])
+                    ->pluck('title', 'id')
+                    ->toArray();
+
+                return $pages;
             })
             ->registerRule('other', trans('webed-custom-fields::rules.model_name'), 'model_name', [
                 'page' => WEBED_PAGES
