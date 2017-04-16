@@ -1,8 +1,9 @@
 <?php
 
-use \WebEd\Base\Models\Contracts\BaseModelContract;
-use \WebEd\Base\Models\EloquentBase;
-use \WebEd\Plugins\CustomFields\Repositories\Contracts\CustomFieldContract;
+use WebEd\Base\Models\Contracts\BaseModelContract;
+use WebEd\Base\Models\EloquentBase;
+use WebEd\Base\CustomFields\Repositories\Contracts\CustomFieldRepositoryContract;
+use WebEd\Base\CustomFields\Repositories\CustomFieldRepository;
 
 if (!function_exists('get_field')) {
     /**
@@ -14,24 +15,24 @@ if (!function_exists('get_field')) {
     function get_field(BaseModelContract $object, $alias = null, $default = null)
     {
         /**
-         * @var \WebEd\Plugins\CustomFields\Repositories\CustomFieldRepository $customFieldRepository
+         * @var CustomFieldRepository $customFieldRepository
          */
-        $customFieldRepository = app(CustomFieldContract::class);
+        $customFieldRepository = app(CustomFieldRepositoryContract::class);
 
         $objectModelPrimaryKey = $object->getPrimaryKey();
 
-        $field = $customFieldRepository
-            ->where([
+        if ($alias === null || !trim($alias)) {
+            return $customFieldRepository->findWhere([
                 'use_for' => get_class($object),
                 'use_for_id' => $object->$objectModelPrimaryKey
             ]);
-        if ($alias === null || !trim($alias)) {
-            return $field->get();
         }
 
-        $field = $field
-            ->where('slug', '=', $alias)
-            ->first();
+        $field = $customFieldRepository->findWhere([
+            'use_for' => get_class($object),
+            'use_for_id' => $object->$objectModelPrimaryKey,
+            'slug' => $alias,
+        ]);
 
         if (!$field) {
             return $default;

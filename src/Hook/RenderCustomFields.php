@@ -7,17 +7,8 @@ use WebEd\Base\Users\Models\User;
 
 class RenderCustomFields
 {
-    /**
-     * @param string $location
-     * @param string $currentAction
-     * @param BaseModelContract|EloquentBase $object
-     */
-    public function handle($location, $currentAction, $object = null)
+    public function __construct()
     {
-        if ($location != 'main') {
-            return;
-        }
-
         /**
          * @var User $loggedInUser
          */
@@ -29,6 +20,18 @@ class RenderCustomFields
             'logged_in_user' => $loggedInUser->id,
             'logged_in_user_has_role' => $roles
         ]);
+    }
+
+    /**
+     * @param string $location
+     * @param string $currentAction
+     * @param BaseModelContract|EloquentBase $object
+     */
+    public function handle($location, $currentAction, $object = null)
+    {
+        if ($location != 'main') {
+            return;
+        }
 
         switch ($currentAction) {
             case WEBED_PAGES:
@@ -40,6 +43,11 @@ class RenderCustomFields
                 break;
         }
 
+        $this->render($object);
+    }
+
+    protected function render($object)
+    {
         $customFieldBoxes = get_custom_field_boxes($object, isset($object->id) ? $object->id : 0);
 
         if (!$customFieldBoxes) {

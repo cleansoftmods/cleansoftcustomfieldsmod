@@ -84,36 +84,4 @@ class BootstrapModuleMiddleware
                 'page' => WEBED_PAGES
             ]);
     }
-
-    protected function registerBlogFields()
-    {
-        if (modules_management()->isActivated('webed-blog') && modules_management()->isInstalled('webed-blog')) {
-            CustomFieldSupportFacade::registerRuleGroup('blog')
-                ->registerRule('blog', 'Post template', 'blog.post_template', get_templates('Post'))
-                ->registerRule('blog', 'Category template', 'blog.category_template', get_templates('Category'))
-                ->registerRule('blog', 'Category', 'blog.category', function () {
-                    $categories = get_categories();
-
-                    $categoriesArr = [];
-                    foreach ($categories as $row) {
-                        $categoriesArr[$row->id] = $row->indent_text . $row->title;
-                    }
-                    return $categoriesArr;
-                })
-                ->registerRule('blog', 'Posts with related category', 'blog.post_with_related_category', function () {
-                    $categories = get_categories();
-
-                    $categoriesArr = [];
-                    foreach ($categories as $row) {
-                        $categoriesArr[$row->id] = $row->indent_text . $row->title;
-                    }
-                    return $categoriesArr;
-                })
-                ->registerRule('blog', 'Post with related category template', 'blog.post_with_related_category_template', get_templates('Category'))
-                ->registerRule('other', 'Model name', 'model_name', [
-                    'blog.post' => '(Blog) Post',
-                    'blog.category' => '(Blog) Category',
-                ]);
-        }
-    }
 }
