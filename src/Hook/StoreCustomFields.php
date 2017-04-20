@@ -51,12 +51,7 @@ class StoreCustomFields
      */
     public function handleUpdate($screenName, $id, $result)
     {
-        switch ($screenName) {
-            case WEBED_PAGES:
-                $pageRepo = app(PageRepositoryContract::class);
-                $this->saveCustomFields(get_class($pageRepo->getModel()), $result);
-                break;
-        }
+        $this->saveCustomFields($screenName, $result);
     }
 
     /**
@@ -82,6 +77,7 @@ class StoreCustomFields
             'field_item_id' => $data['id'],
             'slug' => $data['slug'],
             'use_for' => $screen,
+            'use_for_id' => $id,
         ]);
 
         $value = $this->parseFieldValue($data);

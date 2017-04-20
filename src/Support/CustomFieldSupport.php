@@ -70,11 +70,17 @@ class CustomFieldSupport
         if (!isset($this->ruleGroups[$group])) {
             $this->registerRuleGroup($group);
         }
+
         $this->ruleGroups[$group]['items'][$slug] = [
             'title' => $title,
             'slug' => $slug,
-            'data' => (!isset($this->ruleGroups[$group]['items'][$slug])) ? $data : array_merge($this->ruleGroups[$group]['items'][$slug]['data'], $data)
+            'data' => []
         ];
+        if (is_object($data)) {
+            $this->ruleGroups[$group]['items'][$slug]['data'] = $data;
+        } else {
+            $this->ruleGroups[$group]['items'][$slug]['data'] = array_merge($this->ruleGroups[$group]['items'][$slug]['data'], $data);
+        }
         return $this;
     }
 
@@ -151,23 +157,28 @@ class CustomFieldSupport
      */
     protected function checkEachRule(array $ruleGroup)
     {
-        foreach ($ruleGroup as $rule) {
-            if (!isset($this->rules[$rule['name']])) {
-                continue;
+        foreach ($ruleGroup as $ruleGroupItem) {
+            if (!isset($this->rules[$ruleGroupItem['name']])) {
+                return false;
             }
-            if ($rule['type'] == '==') {
-                if (is_array($this->rules[$rule['name']])) {
-                    return in_array($rule['value'], $this->rules[$rule['name']]);
+            if ($ruleGroupItem['type'] == '==') {
+                if (is_array($this->rules[$ruleGroupItem['name']])) {
+                    $result = in_array($ruleGroupItem['value'], $this->rules[$ruleGroupItem['name']]);
+                } else {
+                    $result = $ruleGroupItem['value'] == $this->rules[$ruleGroupItem['name']];
                 }
-                return $rule['value'] == $this->rules[$rule['name']];
             } else {
-                if (is_array($this->rules[$rule['name']])) {
-                    return !in_array($rule['value'], $this->rules[$rule['name']]);
+                if (is_array($this->rules[$ruleGroupItem['name']])) {
+                    $result = !in_array($ruleGroupItem['value'], $this->rules[$ruleGroupItem['name']]);
+                } else {
+                    $result = $ruleGroupItem['value'] != $this->rules[$ruleGroupItem['name']];
                 }
-                return $rule['value'] != $this->rules[$rule['name']];
+            }
+            if (!$result) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**

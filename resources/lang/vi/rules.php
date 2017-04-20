@@ -11,4 +11,5 @@ return [
     'page_template' => 'Giao diện trang tĩnh',
     'page' => 'Trang tĩnh',
     'model_name' => 'Tên model',
+    'model_name_page' => 'Trang tĩnh',
 ];

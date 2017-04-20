@@ -70,7 +70,9 @@ class BootstrapModuleMiddleware
 
     protected function registerPagesFields()
     {
-        CustomFieldSupportFacade::registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', get_templates('Page'))
+        CustomFieldSupportFacade::registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', function () {
+            return get_templates('Page');
+        })
             ->registerRule('basic', trans('webed-custom-fields::rules.page'), 'page', function () {
                 $pages = get_pages([
                     'select' => [
@@ -88,8 +90,10 @@ class BootstrapModuleMiddleware
 
                 return $pages;
             })
-            ->registerRule('other', trans('webed-custom-fields::rules.model_name'), 'model_name', [
-                'page' => WEBED_PAGES
-            ]);
+            ->registerRule('other', trans('webed-custom-fields::rules.model_name'), 'model_name', function () {
+                return [
+                    WEBED_PAGES => trans('webed-custom-fields::rules.model_name_page'),
+                ];
+            });
     }
 }

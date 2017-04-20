@@ -7,30 +7,26 @@ use WebEd\Base\CustomFields\Repositories\CustomFieldRepository;
 
 if (!function_exists('get_field')) {
     /**
-     * @param BaseModelContract|EloquentBase $object
+     * @param int $id
+     * @param string $screenName
      * @param null $alias
-     * @param null|mixed $default
-     * @return mixed|null
+     * @param null $default
+     * @return mixed
      */
-    function get_field(BaseModelContract $object, $alias = null, $default = null)
+    function get_field($id, $screenName, $alias = null, $default = null)
     {
-        /**
-         * @var CustomFieldRepository $customFieldRepository
-         */
         $customFieldRepository = app(CustomFieldRepositoryContract::class);
-
-        $objectModelPrimaryKey = $object->getPrimaryKey();
 
         if ($alias === null || !trim($alias)) {
             return $customFieldRepository->findWhere([
-                'use_for' => get_class($object),
-                'use_for_id' => $object->$objectModelPrimaryKey
+                'use_for' => $screenName,
+                'use_for_id' => $id,
             ]);
         }
 
         $field = $customFieldRepository->findWhere([
-            'use_for' => get_class($object),
-            'use_for_id' => $object->$objectModelPrimaryKey,
+            'use_for' => $screenName,
+            'use_for_id' => $id,
             'slug' => $alias,
         ]);
 
@@ -44,13 +40,14 @@ if (!function_exists('get_field')) {
 
 if (!function_exists('has_field')) {
     /**
-     * @param BaseModelContract $object
+     * @param int $id
+     * @param string $screenName
      * @param null $alias
      * @return bool
      */
-    function has_field(BaseModelContract $object, $alias = null)
+    function has_field($id, $screenName, $alias = null)
     {
-        if (!get_field($object, $alias)) {
+        if (!get_field($id, $screenName, $alias)) {
             return false;
         }
         return true;

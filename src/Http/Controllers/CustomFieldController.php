@@ -218,6 +218,8 @@ class CustomFieldController extends BaseAdminController
 
         $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.post');
 
+        //dd($request->all());
+
         $result = $this->repository->updateFieldGroup($item, $request->get('field_group'));
 
         do_action(BASE_ACTION_AFTER_UPDATE, WEBED_CUSTOM_FIELDS, $id, $result);

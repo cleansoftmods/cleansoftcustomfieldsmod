@@ -9,7 +9,7 @@ class ManageCustomFields {
          * Pass data to form when submit
          */
         this.$body.on('submit', '.form-update-field-group', function (event) {
-            // event.preventDefault();
+            //event.preventDefault();
             let dataRules = JSON.stringify(_self.exportRulesToJson());
             let dataFields = JSON.stringify(_self.exportFieldsToJson());
             $('#custom_fields_rules').html(dataRules).val(dataRules);
@@ -24,9 +24,10 @@ class ManageCustomFields {
         let _self = this;
 
         let CURRENT_RULES = $.parseJSON($('#custom_fields_rules').val());
-        let $globalTemplate = $(_self.RULES_GROUP_TEMPLATE_HTML),
-            lineGroupTemplate = $('#rules_line_group_template').html(),
-            $groupContainer = $('.line-group-container');
+        console.log(CURRENT_RULES);
+        let $_GLOBAL_TEMPLATE = $(_self.RULES_GROUP_TEMPLATE_HTML),
+            LINE_GROUP_TEMPLATE = $('#rules_line_group_template').html(),
+            $_GROUP_CONTAINER = $('.line-group-container');
 
         /**
          * Add new rule
@@ -34,15 +35,15 @@ class ManageCustomFields {
         _self.$body.on('click', '.location-add-rule', function (event) {
             event.preventDefault();
             let $current = $(this);
-            let $template = $globalTemplate.clone();
+            let $template = $_GLOBAL_TEMPLATE.clone();
 
             if ($current.hasClass('location-add-rule-and')) {
                 $current.closest('.line-group').append($template);
             } else {
-                let $group = $(lineGroupTemplate);
+                let $group = $(LINE_GROUP_TEMPLATE);
 
                 $group.append($template);
-                $groupContainer.append($group);
+                $_GROUP_CONTAINER.append($group);
             }
             $template.find('.rule-a').trigger('change');
         });
@@ -80,16 +81,16 @@ class ManageCustomFields {
             $('.location-add-rule').trigger('click');
         } else {
             CURRENT_RULES.forEach(function (rules, indexRule) {
-                let $group = $('<div class="line-group"></div>');
+                let $group = $(LINE_GROUP_TEMPLATE);
                 rules.forEach(function (item, index) {
-                    let $template = $globalTemplate.clone();
+                    let $template = $_GLOBAL_TEMPLATE.clone();
                     $template.find('.rule-a').val(item.name);
                     $template.find('.rule-type').val(item.type);
                     $template.find('.rule-b:not([data-rel="' + item.name + '"])').addClass('hidden');
                     $template.find('.rule-b[data-rel="' + item.name + '"]').val(item.value);
                     $group.append($template);
                 });
-                $groupContainer.append($group);
+                $_GROUP_CONTAINER.append($group);
             });
         }
     }

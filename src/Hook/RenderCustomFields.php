@@ -24,16 +24,19 @@ class RenderCustomFields
 
     /**
      * @param string $location
-     * @param string $currentAction
+     * @param string $screenName
      * @param BaseModelContract|EloquentBase $object
      */
-    public function handle($location, $currentAction, $object = null)
+    public function handle($location, $screenName, $object = null)
     {
-        if ($location != 'main') {
+        /**
+         * If the location is not in main or the current page is not editing page
+         */
+        if ($location != 'main' || substr($screenName, -6) == '.index') {
             return;
         }
 
-        switch ($currentAction) {
+        switch ($screenName) {
             case WEBED_PAGES:
                 add_custom_fields_rules_to_check([
                     'page_template' => isset($object->page_template) ? $object->page_template : '',
@@ -43,12 +46,16 @@ class RenderCustomFields
                 break;
         }
 
-        $this->render($object);
+        $this->render($screenName, isset($object->id) ? $object->id : '');
     }
 
-    protected function render($object)
+    /**
+     * @param $screenName
+     * @param $id
+     */
+    protected function render($screenName, $id)
     {
-        $customFieldBoxes = get_custom_field_boxes($object, isset($object->id) ? $object->id : 0);
+        $customFieldBoxes = get_custom_field_boxes($screenName, $id);
 
         if (!$customFieldBoxes) {
             return;
