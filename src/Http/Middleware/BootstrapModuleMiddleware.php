@@ -22,7 +22,7 @@ class BootstrapModuleMiddleware
         /**
          * Register to dashboard menu
          */
-        \DashboardMenu::registerItem([
+        dashboard_menu()->registerItem([
             'id' => 'webed-custom-fields',
             'priority' => 999.3,
             'parent_id' => null,

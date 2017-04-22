@@ -47,11 +47,9 @@ class UseCustomFields {
 
         let initWYSIWYG = function ($element, type) {
             "use strict";
-            let toolbar = type === 'basic' ? {
-                    toolbar: [['mode', 'Source', 'Image', 'TextColor', 'BGColor', 'Styles', 'Format', 'Font', 'FontSize', 'CreateDiv', 'PageBreak', 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', 'RemoveFormat']]
-                } : {};
-            $element.ckeditor(toolbar);
-
+            WebEd.wysiwyg($element, {
+                toolbar: 'basic'
+            });
             return $element;
         };
 
