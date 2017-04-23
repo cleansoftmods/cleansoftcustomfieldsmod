@@ -71,7 +71,7 @@ class BootstrapModuleMiddleware
     protected function registerPagesFields()
     {
         CustomFieldSupportFacade::registerRule('basic', trans('webed-custom-fields::rules.page_template'), 'page_template', function () {
-            return get_templates('Page');
+            return get_templates('page');
         })
             ->registerRule('basic', trans('webed-custom-fields::rules.page'), 'page', function () {
                 $pages = get_pages([
