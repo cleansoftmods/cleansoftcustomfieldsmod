@@ -30,7 +30,7 @@ Route::group(['prefix' => $adminRoute . '/custom-fields'], function (Router $rou
 
     $router->get('/edit/{id}', 'CustomFieldController@getEdit')
         ->name('admin::custom-fields.field-group.edit.get')
-        ->middleware('has-permission:edit-field-groups');
+        ->middleware('has-permission:view-custom-fields');
 
     $router->post('/edit/{id}', 'CustomFieldController@postEdit')
         ->name('admin::custom-fields.field-group.edit.post')

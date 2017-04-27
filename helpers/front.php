@@ -30,7 +30,7 @@ if (!function_exists('get_field')) {
             'slug' => $alias,
         ]);
 
-        if (!$field) {
+        if (!$field || !$field->resolved_value) {
             return $default;
         }
 
