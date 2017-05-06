@@ -55,14 +55,14 @@ class StoreCustomFields
     }
 
     /**
-     * @param $type
+     * @param $screenName
      * @param $id
      */
-    protected function saveCustomFields($type, $id)
+    protected function saveCustomFields($screenName, $id)
     {
         $data = $this->parseRawData($this->request->get('custom_fields', []));
         foreach ($data as $row) {
-            $this->saveCustomField($type, $id, $row);
+            $this->saveCustomField($screenName, $id, $row);
         }
     }
 
@@ -86,14 +86,14 @@ class StoreCustomFields
             $value = json_encode($value);
         }
 
+        $data['value'] = $value;
+
         if ($currentMeta) {
-            $data['value'] = $value;
             $this->customFieldRepository->update($currentMeta, $data);
         } else {
             $data['use_for'] = $screen;
             $data['use_for_id'] = $id;
             $data['field_item_id'] = $data['id'];
-            $data['value'] = $value;
 
             $this->customFieldRepository->create($data);
         }

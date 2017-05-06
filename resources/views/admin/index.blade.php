@@ -22,9 +22,29 @@
                         {{ trans('webed-custom-fields::base.all_field_groups') }}
                     </h3>
                     <div class="box-tools">
-                        <a class="btn btn-transparent green btn-sm"
+                        <a class="btn green btn-sm"
                            href="{{ route('admin::custom-fields.field-group.create.get') }}">
                             <i class="fa fa-plus"></i> {{ trans('webed-core::base.form.create') }}
+                        </a>
+                        <form action="{{ route('admin::custom-fields.field-group.import.post') }}"
+                              method="POST"
+                              class="inline-block import-field-group">
+                            {!! csrf_field() !!}
+                            <input type="file"
+                                   accept="application/json"
+                                   class="hidden"
+                                   id="import_json"
+                                   name="import_json">
+                            <label class="btn red btn-sm trigger-import" for="import_json">
+                                <i class="fa fa-upload"></i>
+                                {{ trans('webed-custom-fields::base.import') }}
+                            </label>
+                        </form>
+                        <a class="btn purple btn-sm"
+                           download
+                           href="{{ route('admin::custom-fields.field-group.export.get') }}">
+                            <i class="fa fa-download"></i>
+                            {{ trans('webed-custom-fields::base.export') }}
                         </a>
                     </div>
                 </div>

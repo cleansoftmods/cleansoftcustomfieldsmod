@@ -39,4 +39,13 @@ Route::group(['prefix' => $adminRoute . '/custom-fields'], function (Router $rou
     $router->delete('/delete/{id}', 'CustomFieldController@deleteDelete')
         ->name('admin::custom-fields.field-group.delete.delete')
         ->middleware('has-permission:delete-field-groups');
+
+    $router->get('/export', 'CustomFieldController@getExport')
+        ->name('admin::custom-fields.field-group.export.get')
+        ->middleware('has-permission:edit-field-groups');
+
+    $router->post('/import', 'CustomFieldController@postImport')
+        ->name('admin::custom-fields.field-group.import.post')
+        ->middleware('has-permission:edit-field-groups');
+
 });

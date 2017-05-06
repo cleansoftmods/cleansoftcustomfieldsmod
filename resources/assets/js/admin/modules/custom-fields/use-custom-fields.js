@@ -380,7 +380,7 @@ class UseCustomFields {
         };
 
         _self.$_EXPORT_TO.closest('form').on('submit', function (event) {
-            _self.$_EXPORT_TO.val(JSON.stringify(getFieldGroups()));
+            _self.$_EXPORT_TO.val(Helpers.jsonEncode(getFieldGroups()));
         });
     }
 }

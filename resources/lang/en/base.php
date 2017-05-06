@@ -74,4 +74,7 @@ return [
             'or' => 'Or',
         ],
     ],
+
+    'import' => 'Import',
+    'export' => 'Export',
 ];

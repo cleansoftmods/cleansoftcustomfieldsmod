@@ -18,7 +18,7 @@ class FieldGroup extends BaseModel implements FieldGroupModelContract
         'updated_by',
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

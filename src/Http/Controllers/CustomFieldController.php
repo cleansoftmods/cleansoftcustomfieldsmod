@@ -6,6 +6,8 @@ use WebEd\Base\CustomFields\Http\Requests\CreateFieldGroupRequest;
 use WebEd\Base\CustomFields\Http\Requests\UpdateFieldGroupRequest;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
+use WebEd\Base\CustomFields\Support\ExportCustomFields;
+use WebEd\Base\CustomFields\Support\ImportCustomFields;
 use WebEd\Base\Http\Controllers\BaseAdminController;
 use WebEd\Base\Http\DataTables\AbstractDataTables;
 use Yajra\Datatables\Engines\BaseEngine;
@@ -43,6 +45,8 @@ class CustomFieldController extends BaseAdminController
      */
     public function getIndex(FieldGroupsListDataTable $dataTables)
     {
+        $this->assets->addJavascriptsDirectly(asset('admin/modules/custom-fields/import-field-group.js'));
+
         $this->setPageTitle(trans('webed-custom-fields::base.page_title'));
 
         $this->dis['dataTable'] = $dataTables->run();
@@ -218,8 +222,6 @@ class CustomFieldController extends BaseAdminController
 
         $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.post');
 
-        //dd($request->all());
-
         $result = $this->repository->updateFieldGroup($item, $request->get('field_group'));
 
         do_action(BASE_ACTION_AFTER_UPDATE, WEBED_CUSTOM_FIELDS, $id, $result);
@@ -253,5 +255,27 @@ class CustomFieldController extends BaseAdminController
         $msg = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
         $code = $result ? \Constants::SUCCESS_NO_CONTENT_CODE : \Constants::ERROR_CODE;
         return response()->json(response_with_messages($msg, !$result, $code), $code);
+    }
+
+    /**
+     * @param ExportCustomFields $exportSupport
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getExport(ExportCustomFields $exportSupport)
+    {
+        $ids = [];
+        foreach ($this->repository->get(['id']) as $item) {
+            $ids[] = $item->id;
+        }
+        $json = $exportSupport->export($ids);
+        return response()->json($json, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    public function postImport(ImportCustomFields $importCustomFields)
+    {
+        $json = $this->request->get('json_data');
+        $result = $importCustomFields->import($json);
+        $message = $result ? 'Field group imported' : 'Error occurred when import field group';
+        return response_with_messages($message, !$result, ($result ? \Constants::SUCCESS_NO_CONTENT_CODE : \Constants::ERROR_CODE));
     }
 }

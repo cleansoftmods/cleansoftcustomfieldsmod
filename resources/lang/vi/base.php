@@ -74,4 +74,7 @@ return [
             'or' => 'Hoặc',
         ],
     ],
+
+    'import' => 'Nhập dữ liệu',
+    'export' => 'Xuất dữ liệu',
 ];

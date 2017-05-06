@@ -46,7 +46,7 @@ class RenderCustomFields
                 break;
         }
 
-        $this->render($screenName, isset($object->id) ? $object->id : '');
+        $this->render($screenName, isset($object->id) ? $object->id : null);
     }
 
     /**
