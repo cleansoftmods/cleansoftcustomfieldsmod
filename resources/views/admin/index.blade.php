@@ -27,14 +27,12 @@
                             <i class="fa fa-plus"></i> {{ trans('webed-core::base.form.create') }}
                         </a>
                         <form action="{{ route('admin::custom-fields.field-group.import.post') }}"
-                              method="POST"
                               class="inline-block import-field-group">
                             {!! csrf_field() !!}
                             <input type="file"
                                    accept="application/json"
                                    class="hidden"
-                                   id="import_json"
-                                   name="import_json">
+                                   id="import_json">
                             <label class="btn red btn-sm trigger-import" for="import_json">
                                 <i class="fa fa-upload"></i>
                                 {{ trans('webed-custom-fields::base.import') }}
