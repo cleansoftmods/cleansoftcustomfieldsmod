@@ -2,15 +2,10 @@
 
 use WebEd\Base\Models\Contracts\BaseModelContract;
 use WebEd\Base\Repositories\Eloquent\EloquentBaseRepository;
-use WebEd\Base\Caching\Services\Traits\Cacheable;
-use WebEd\Base\Caching\Services\Contracts\CacheableContract;
-
 use WebEd\Base\CustomFields\Repositories\Contracts\CustomFieldRepositoryContract;
 
-class CustomFieldRepository extends EloquentBaseRepository implements CustomFieldRepositoryContract, CacheableContract
+class CustomFieldRepository extends EloquentBaseRepository implements CustomFieldRepositoryContract
 {
-    use Cacheable;
-
     /**
      * @param array $data
      * @return int
