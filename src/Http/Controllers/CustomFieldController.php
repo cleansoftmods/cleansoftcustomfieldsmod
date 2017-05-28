@@ -73,7 +73,7 @@ class CustomFieldController extends BaseAdminController
     {
         $data = [];
         if ($this->request->get('customActionType', null) === 'group_action') {
-            if (!$this->userRepository->hasPermission($this->loggedInUser, ['your-permission'])) {
+            if (!$this->userRepository->hasPermission($this->loggedInUser, ['edit-field-groups'])) {
                 return [
                     'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
                     'customActionStatus' => 'danger',
@@ -85,7 +85,7 @@ class CustomFieldController extends BaseAdminController
 
             switch ($actionValue) {
                 case 'deleted':
-                    if (!$this->userRepository->hasPermission($this->loggedInUser, ['your-permission'])) {
+                    if (!$this->userRepository->hasPermission($this->loggedInUser, ['delete-field-groups'])) {
                         return [
                             'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
                             'customActionStatus' => 'danger',
