@@ -33,7 +33,7 @@ class CustomFieldController extends BaseAdminController
         $this->middleware(function (Request $request, $next) {
             $this->getDashboardMenu($this->module);
 
-            $this->breadcrumbs->addLink(trans('webed-custom-fields::base.page_title'), route('admin::custom-fields.index.get'));
+            $this->breadcrumbs->addLink(trans($this->module . '::base.page_title'), route('admin::custom-fields.index.get'));
 
             return $next($request);
         });
@@ -47,7 +47,7 @@ class CustomFieldController extends BaseAdminController
     {
         $this->assets->addJavascriptsDirectly(asset('admin/modules/custom-fields/import-field-group.js'));
 
-        $this->setPageTitle(trans('webed-custom-fields::base.page_title'));
+        $this->setPageTitle(trans($this->module . '::base.page_title'));
 
         $this->dis['dataTable'] = $dataTables->run();
 
@@ -142,8 +142,8 @@ class CustomFieldController extends BaseAdminController
     {
         do_action(BASE_ACTION_BEFORE_CREATE, WEBED_CUSTOM_FIELDS, 'create.get');
 
-        $this->setPageTitle(trans('webed-custom-fields::base.form.create_field_group'));
-        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.form.create_field_group'));
+        $this->setPageTitle(trans($this->module . '::base.form.create_field_group'));
+        $this->breadcrumbs->addLink(trans($this->module . '::base.form.create_field_group'));
 
         return do_filter(BASE_FILTER_CONTROLLER, $this, WEBED_CUSTOM_FIELDS, 'create.get')->viewAdmin('create');
     }
@@ -186,7 +186,7 @@ class CustomFieldController extends BaseAdminController
 
         if (!$item) {
             flash_messages()
-                ->addMessages(trans('webed-custom-fields::base.item_not_exists'), 'danger')
+                ->addMessages(trans($this->module . '::base.item_not_exists'), 'danger')
                 ->showMessagesOnSession();
 
             return redirect()->back();
@@ -194,8 +194,8 @@ class CustomFieldController extends BaseAdminController
 
         $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.get');
 
-        $this->setPageTitle(trans('webed-custom-fields::base.form.edit_field_group') . ' #' . $item->id);
-        $this->breadcrumbs->addLink(trans('webed-custom-fields::base.form.edit_field_group'));
+        $this->setPageTitle(trans($this->module . '::base.form.edit_field_group') . ' #' . $item->id);
+        $this->breadcrumbs->addLink(trans($this->module . '::base.form.edit_field_group'));
 
         $this->dis['object'] = $item;
 
@@ -268,7 +268,7 @@ class CustomFieldController extends BaseAdminController
             $ids[] = $item->id;
         }
         $json = $exportSupport->export($ids);
-        return response()->json($json, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return response()->json($json, \Constants::SUCCESS_CODE, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     public function postImport(ImportCustomFields $importCustomFields)

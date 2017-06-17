@@ -1,2 +1,396 @@
-!function(e){"use strict";var a=function(){this.$body=$("body"),this.$_UPDATE_TO=$("#custom_fields_container"),this.$_EXPORT_TO=$("#custom_fields_json"),this.CURRENT_DATA=Helpers.jsonDecode(this.$_EXPORT_TO.val(),[]),this.CURRENT_DATA&&(this.handleCustomFields(),this.exportData())};a.prototype.handleCustomFields=function(){var e=this,a=0,t={fieldGroup:$("#_render_customfield_field_group_template").html(),globalSkeleton:$("#_render_customfield_global_skeleton_template").html(),text:$("#_render_customfield_text_template").html(),number:$("#_render_customfield_number_template").html(),email:$("#_render_customfield_email_template").html(),password:$("#_render_customfield_password_template").html(),textarea:$("#_render_customfield_textarea_template").html(),checkbox:$("#_render_customfield_checkbox_template").html(),radio:$("#_render_customfield_radio_template").html(),select:$("#_render_customfield_select_template").html(),image:$("#_render_customfield_image_template").html(),file:$("#_render_customfield_file_template").html(),wysiwyg:$("#_render_customfield_wysiswg_template").html(),repeater:$("#_render_customfield_repeater_template").html(),repeaterItem:$("#_render_customfield_repeater_item_template").html(),repeaterFieldLine:$("#_render_customfield_repeater_line_template").html()},r=function(e,a){return WebEd.wysiwyg(e,{toolbar:"basic"}),e},i=function(e,a){e.forEach(function(e,r){var i=t.globalSkeleton;i=i.replace(/__type__/gi,e.type||""),i=i.replace(/__title__/gi,e.title||""),i=i.replace(/__instructions__/gi,e.instructions||"");var n=$(i);n.find(".meta-box-wrap").append(l(e)),n.data("lcf-registered-data",e),a.append(n)})},l=function(e){var i=t[e.type],l=$('<div class="lcf-'+e.type+'-wrapper"></div>');switch(l.data("lcf-registered-data",e),e.type){case"text":case"number":case"email":case"password":i=i.replace(/__placeholderText__/gi,e.options.placeholderText||""),i=i.replace(/__value__/gi,e.value||e.options.defaultValue||"");break;case"textarea":i=i.replace(/__rows__/gi,e.options.rows||3),i=i.replace(/__placeholderText__/gi,e.options.placeholderText||""),i=i.replace(/__value__/gi,e.value||e.options.defaultValue||"");break;case"image":if(i=i.replace(/__value__/gi,e.value||e.options.defaultValue||""),e.value)i=i.replace(/__image__/gi,e.value||e.options.defaultValue||"");else{var c=$(i).find("img").attr("data-default");i=i.replace(/__image__/gi,c||e.options.defaultValue||"")}break;case"file":i=i.replace(/__value__/gi,e.value||e.options.defaultValue||"");break;case"select":var s=$(i),d=o(e.options.selectChoices);return d.forEach(function(e,a){s.append('<option value="'+e[0]+'">'+e[1]+"</option>")}),s.val(array_get(e,"value",e.options.defaultValue)),l.append(s),l;case"checkbox":var p=o(e.options.selectChoices),_=Helpers.jsonDecode(e.value);return p.forEach(function(e,a){var t=i.replace(/__value__/gi,e[0]||"");t=t.replace(/__title__/gi,e[1]||""),t=t.replace(/__checked__/gi,$.inArray(e[0],_)!=-1?"checked":""),l.append($(t))}),l;case"radio":var u=o(e.options.selectChoices),f=!1;return u.forEach(function(t,r){var n=i.replace(/__value__/gi,t[0]||"");n=n.replace(/__id__/gi,e.id+e.slug+a),n=n.replace(/__title__/gi,t[1]||""),n=n.replace(/__checked__/gi,e.value===t[0]?"checked":""),l.append($(n)),e.value===t[0]&&(f=!0)}),f===!1&&l.find("input[type=radio]:first").prop("checked",!0),l;case"repeater":var m=$(i);return m.data("lcf-registered-data",e),m.find("> .repeater-add-new-field").html(e.options.buttonLabel||"Add new item"),m.find("> .sortable-wrapper").sortable(),n(e.items,e.value||[],m.find("> .field-group-items")),m;case"wysiwyg":i=i.replace(/__value__/gi,e.value||"");var v=$(i);return r(v,e.options.wysiwygToolbar||"basic")}return l.append($(i)),l},n=function(e,a,r){return r.data("lcf-registered-data",e),a.forEach(function(a,i){var l=r.find("> .ui-sortable-handle").length+1,n=t.repeaterItem;n=n.replace(/__position__/gi,l);var o=$(n);o.data("lcf-registered-data",e),c(e,a,o.find("> .field-line-wrapper > .field-group")),r.append(o)}),r},c=function(e,r,i){return r.forEach(function(e,r){a++;var n=t.repeaterFieldLine;n=n.replace(/__title__/gi,e.title||""),n=n.replace(/__instructions__/gi,e.instructions||"");var c=$(n);c.data("lcf-registered-data",e),c.find("> .repeater-item-input").append(l(e)),i.append(c)}),i},o=function(e){var a=[];return e.split("\n").forEach(function(e,t){var r=e.split(":");r[0]&&r[1]&&(r[0]=r[0].trim(),r[1]=r[1].trim()),a.push(r)}),a};this.$body.on("click",".remove-field-line",function(e){e.preventDefault();var a=$(this);a.parent().animate({opacity:.1},300,function(){a.parent().remove()})}),this.$body.on("click",".collapse-field-line",function(e){e.preventDefault();var a=$(this);a.toggleClass("collapsed-line")}),this.$body.on("click",".repeater-add-new-field",function(e){e.preventDefault();var t=$.extend(!0,{},$(this).prev(".field-group-items")),r=t.data("lcf-registered-data");a++,n(r,[r],t)}),this.CURRENT_DATA.forEach(function(a,r){var l=t.fieldGroup;l=l.replace(/__title__/gi,a.title||"");var n=$(l);i(a.items,n.find(".meta-boxes-body")),n.data("lcf-field-group",a),e.$_UPDATE_TO.append(n)})},a.prototype.exportData=function(){var e=this,a=function(){var e=[];return $("#custom_fields_container").find("> .meta-boxes").each(function(){var a=$(this),r=a.data("lcf-field-group"),i=a.find("> .meta-boxes-body > .meta-box");r.items=t(i),e.push(r)}),e},t=function(e){var a=[];return e.each(function(){a.push(r($(this)))}),a},r=function(e){var a=$.extend(!0,{},e.data("lcf-registered-data"));switch(a.type){case"text":case"number":case"email":case"password":case"image":case"file":a.value=e.find("> .meta-box-wrap input").val();break;case"wysiwyg":case"textarea":a.value=e.find("> .meta-box-wrap textarea").val();break;case"checkbox":a.value=[],e.find("> .meta-box-wrap input:checked").each(function(){a.value.push($(this).val())});break;case"radio":a.value=e.find("> .meta-box-wrap input:checked").val();break;case"select":a.value=e.find("> .meta-box-wrap select").val();break;case"repeater":a.value=[];var t=e.find("> .meta-box-wrap > .lcf-repeater > .field-group-items > li");t.each(function(){var e=$(this),t=e.find("> .field-line-wrapper > .field-group");a.value.push(i(t.find("> li")))});break;default:a=null}return a},i=function(e){var a=[];return e.each(function(){var e=$(this);a.push(l(e))}),a},l=function(e){var a=$.extend(!0,{},e.data("lcf-registered-data"));switch(a.type){case"text":case"number":case"email":case"password":case"image":case"file":a.value=e.find("> .repeater-item-input input").val();break;case"wysiwyg":case"textarea":a.value=e.find("> .repeater-item-input textarea").val();break;case"checkbox":a.value=[],e.find("> .repeater-item-input input:checked").each(function(){a.value.push($(this).val())});break;case"radio":a.value=e.find("> .repeater-item-input input:checked").val();break;case"select":a.value=e.find("> .repeater-item-input select").val();break;case"repeater":a.value=[];var t=e.find("> .repeater-item-input > .lcf-repeater > .field-group-items > li");t.each(function(){var e=$(this),t=e.find("> .field-line-wrapper > .field-group");a.value.push(i(t.find("> li")))});break;default:a=null}return a};e.$_EXPORT_TO.closest("form").on("submit",function(t){e.$_EXPORT_TO.val(Helpers.jsonEncode(a()))})},function(e){e(document).ready(function(){new a})}(jQuery)}(this.LaravelElixirBundle=this.LaravelElixirBundle||{});
+(function (exports) {
+'use strict';
+
+var UseCustomFields = function UseCustomFields() {
+    this.$body = $('body');
+
+    /**
+     * Where to show the custom field elements
+     */
+    this.$_UPDATE_TO = $('#custom_fields_container');
+    /**
+     * Where to export json data when submit form
+     */
+    this.$_EXPORT_TO = $('#custom_fields_json');
+
+    this.CURRENT_DATA = Helpers.jsonDecode(this.$_EXPORT_TO.val(), []);
+
+    if (this.CURRENT_DATA) {
+        this.handleCustomFields();
+        this.exportData();
+    }
+};
+
+UseCustomFields.prototype.handleCustomFields = function handleCustomFields () {
+    var _self = this;
+
+    var repeaterFieldAdded = 0;
+    /**
+     * The html template of custom fields
+     */
+    var FIELD_TEMPLATE = {
+        fieldGroup: $('#_render_customfield_field_group_template').html(),
+        globalSkeleton: $('#_render_customfield_global_skeleton_template').html(),
+        text: $('#_render_customfield_text_template').html(),
+        number: $('#_render_customfield_number_template').html(),
+        email: $('#_render_customfield_email_template').html(),
+        password: $('#_render_customfield_password_template').html(),
+        textarea: $('#_render_customfield_textarea_template').html(),
+        checkbox: $('#_render_customfield_checkbox_template').html(),
+        radio: $('#_render_customfield_radio_template').html(),
+        select: $('#_render_customfield_select_template').html(),
+        image: $('#_render_customfield_image_template').html(),
+        file: $('#_render_customfield_file_template').html(),
+        wysiwyg: $('#_render_customfield_wysiswg_template').html(),
+        repeater: $('#_render_customfield_repeater_template').html(),
+        repeaterItem: $('#_render_customfield_repeater_item_template').html(),
+        repeaterFieldLine: $('#_render_customfield_repeater_line_template').html()
+    };
+
+    var initWYSIWYG = function ($element, type) {
+        "use strict";
+        WebEd.wysiwyg($element, {
+            toolbar: 'basic'
+        });
+        return $element;
+    };
+
+    var initCustomFieldsBoxes = function (boxes, $appendTo) {
+        boxes.forEach(function (box, indexBox) {
+            var skeleton = FIELD_TEMPLATE.globalSkeleton;
+            skeleton = skeleton.replace(/__type__/gi, box.type || '');
+            skeleton = skeleton.replace(/__title__/gi, box.title || '');
+            skeleton = skeleton.replace(/__instructions__/gi, box.instructions || '');
+
+            var $skeleton = $(skeleton);
+            $skeleton.find('.meta-box-wrap').append(registerLine(box));
+            $skeleton.data('lcf-registered-data', box);
+            $appendTo.append($skeleton);
+        });
+    };
+
+    var registerLine = function (box) {
+        var result = FIELD_TEMPLATE[box.type],
+            $wrapper = $('<div class="lcf-' + box.type + '-wrapper"></div>');
+        $wrapper.data('lcf-registered-data', box);
+        switch (box.type) {
+            case 'text':
+            case 'number':
+            case 'email':
+            case 'password':
+                result = result.replace(/__placeholderText__/gi, box.options.placeholderText || '');
+                result = result.replace(/__value__/gi, box.value || box.options.defaultValue || '');
+                break;
+            case 'textarea':
+                result = result.replace(/__rows__/gi, box.options.rows || 3);
+                result = result.replace(/__placeholderText__/gi, box.options.placeholderText || '');
+                result = result.replace(/__value__/gi, box.value || box.options.defaultValue || '');
+                break;
+            case 'image':
+                result = result.replace(/__value__/gi, box.value || box.options.defaultValue || '');
+                if (!box.value) {
+                    var defaultImage = $(result).find('img').attr('data-default');
+                    result = result.replace(/__image__/gi, defaultImage || box.options.defaultValue || '');
+                } else {
+                    result = result.replace(/__image__/gi, box.value || box.options.defaultValue || '');
+                }
+                break;
+            case 'file':
+                result = result.replace(/__value__/gi, box.value || box.options.defaultValue || '');
+                break;
+            case 'select': {
+                var $result = $(result);
+                var choices = parseChoices(box.options.selectChoices);
+                choices.forEach(function (choice, index) {
+                    $result.append('<option value="' + choice[0] + '">' + choice[1] + '</option>');
+                });
+                $result.val(array_get(box, 'value', box.options.defaultValue));
+                $wrapper.append($result);
+                return $wrapper;
+            }
+                break;
+            case 'checkbox': {
+                var choices$1 = parseChoices(box.options.selectChoices);
+                var boxValue = Helpers.jsonDecode(box.value);
+                choices$1.forEach(function (choice, index) {
+                    var template = result.replace(/__value__/gi, choice[0] || '');
+                    template = template.replace(/__title__/gi, choice[1] || '');
+                    template = template.replace(/__checked__/gi, ($.inArray(choice[0], boxValue) != -1) ? 'checked' : '');
+                    $wrapper.append($(template));
+                });
+                return $wrapper;
+            }
+                break;
+            case 'radio': {
+                var choices$2 = parseChoices(box.options.selectChoices);
+                var isChecked = false;
+                choices$2.forEach(function (choice, index) {
+                    var template = result.replace(/__value__/gi, choice[0] || '');
+                    template = template.replace(/__id__/gi, box.id + box.slug + repeaterFieldAdded);
+                    template = template.replace(/__title__/gi, choice[1] || '');
+                    template = template.replace(/__checked__/gi, (box.value === choice[0]) ? 'checked' : '');
+                    $wrapper.append($(template));
+
+                    if (box.value === choice[0]) {
+                        isChecked = true;
+                    }
+                });
+                if (isChecked === false) {
+                    $wrapper.find('input[type=radio]:first').prop('checked', true);
+                }
+                return $wrapper;
+            }
+                break;
+            case 'repeater': {
+                var $result$1 = $(result);
+                $result$1.data('lcf-registered-data', box);
+
+                $result$1.find('> .repeater-add-new-field').html(box.options.buttonLabel || 'Add new item');
+                $result$1.find('> .sortable-wrapper').sortable();
+                registerRepeaterItem(box.items, box.value || [], $result$1.find('> .field-group-items'));
+                return $result$1;
+            }
+                break;
+            case 'wysiwyg': {
+                result = result.replace(/__value__/gi, box.value || '');
+                var $result$2 = $(result);
+                return initWYSIWYG($result$2, box.options.wysiwygToolbar || 'basic');
+            }
+                break;
+        }
+        $wrapper.append($(result));
+        return $wrapper;
+    };
+
+    var registerRepeaterItem = function (items, data, $appendTo) {
+        $appendTo.data('lcf-registered-data', items);
+        data.forEach(function (dataItem, indexData) {
+            var indexCss = $appendTo.find('> .ui-sortable-handle').length + 1;
+            var result = FIELD_TEMPLATE.repeaterItem;
+            result = result.replace(/__position__/gi, indexCss);
+
+            var $result = $(result);
+            $result.data('lcf-registered-data', items);
+
+            registerRepeaterFieldLine(items, dataItem, $result.find('> .field-line-wrapper > .field-group'));
+
+            $appendTo.append($result);
+        });
+        return $appendTo;
+    };
+
+    var registerRepeaterFieldLine = function (items, data, $appendTo) {
+        data.forEach(function (item, index) {
+            repeaterFieldAdded++;
+
+            var result = FIELD_TEMPLATE.repeaterFieldLine;
+            result = result.replace(/__title__/gi, item.title || '');
+            result = result.replace(/__instructions__/gi, item.instructions || '');
+
+            var $result = $(result);
+            $result.data('lcf-registered-data', item);
+            $result.find('> .repeater-item-input').append(registerLine(item));
+
+            $appendTo.append($result);
+        });
+        return $appendTo;
+    };
+
+    var parseChoices = function (choiceString) {
+        var choices = [];
+        choiceString.split('\n').forEach(function (item, index) {
+            var currentChoice = item.split(':');
+            if (currentChoice[0] && currentChoice[1]) {
+                currentChoice[0] = currentChoice[0].trim();
+                currentChoice[1] = currentChoice[1].trim();
+            }
+            choices.push(currentChoice);
+        });
+        return choices;
+    };
+
+    /**
+     * Remove field item
+     */
+    this.$body.on('click', '.remove-field-line', function (event) {
+        event.preventDefault();
+        var current = $(this);
+        current.parent().animate({
+                opacity: 0.1
+            },
+            300, function () {
+                current.parent().remove();
+            });
+    });
+
+    /**
+     * Collapse field item
+     */
+    this.$body.on('click', '.collapse-field-line', function (event) {
+        event.preventDefault();
+        var current = $(this);
+        current.toggleClass('collapsed-line');
+    });
+
+    /**
+     * Add new repeater line
+     */
+    this.$body.on('click', '.repeater-add-new-field', function (event) {
+        event.preventDefault();
+        var $groupWrapper = $.extend(true, {}, $(this).prev('.field-group-items'));
+        var registeredData = $groupWrapper.data('lcf-registered-data');
+
+        repeaterFieldAdded++;
+
+        registerRepeaterItem(registeredData, [registeredData], $groupWrapper);
+    });
+
+    /**
+     * Init data when page loaded
+     */
+    this.CURRENT_DATA.forEach(function (group, indexGroup) {
+        var groupTemplate = FIELD_TEMPLATE.fieldGroup;
+        groupTemplate = groupTemplate.replace(/__title__/gi, group.title || '');
+
+        var $groupTemplate = $(groupTemplate);
+
+        initCustomFieldsBoxes(group.items, $groupTemplate.find('.meta-boxes-body'));
+
+        $groupTemplate.data('lcf-field-group', group);
+
+        _self.$_UPDATE_TO.append($groupTemplate);
+    });
+};
+
+UseCustomFields.prototype.exportData = function exportData () {
+    var _self = this;
+
+    var getFieldGroups = function () {
+        var fieldGroups = [];
+
+        $('#custom_fields_container').find('> .meta-boxes').each(function () {
+            var $current = $(this);
+            var currentData = $current.data('lcf-field-group');
+            var $items = $current.find('> .meta-boxes-body > .meta-box');
+            currentData.items = getFieldItems($items);
+            fieldGroups.push(currentData);
+        });
+        return fieldGroups;
+    };
+
+    var getFieldItems = function ($items) {
+        var items = [];
+        $items.each(function () {
+            items.push(getFieldItemValue($(this)));
+        });
+        return items;
+    };
+
+    var getFieldItemValue = function ($item) {
+        var customFieldData = $.extend(true, {}, $item.data('lcf-registered-data'));
+        switch (customFieldData.type) {
+            case 'text':
+            case 'number':
+            case 'email':
+            case 'password':
+            case 'image':
+            case 'file':
+                customFieldData.value = $item.find('> .meta-box-wrap input').val();
+                break;
+            case 'wysiwyg':
+            case 'textarea':
+                customFieldData.value = $item.find('> .meta-box-wrap textarea').val();
+                break;
+            case 'checkbox':
+                customFieldData.value = [];
+                $item.find('> .meta-box-wrap input:checked').each(function () {
+                    customFieldData.value.push($(this).val());
+                });
+                break;
+            case 'radio':
+                customFieldData.value = $item.find('> .meta-box-wrap input:checked').val();
+                break;
+            case 'select':
+                customFieldData.value = $item.find('> .meta-box-wrap select').val();
+                break;
+            case 'repeater':
+                customFieldData.value = [];
+                var $repeaterItems = $item.find('> .meta-box-wrap > .lcf-repeater > .field-group-items > li');
+                $repeaterItems.each(function () {
+                    var $current = $(this);
+                    var fieldGroup = $current.find('> .field-line-wrapper > .field-group');
+                    customFieldData.value.push(getRepeaterItemData(fieldGroup.find('> li')));
+                });
+                break;
+            default:
+                customFieldData = null;
+                break;
+        }
+        return customFieldData;
+    };
+
+    var getRepeaterItemData = function ($where) {
+        var data = [];
+        $where.each(function () {
+            var $current = $(this);
+            data.push(getRepeaterItemValue($current));
+        });
+        return data;
+    };
+
+    var getRepeaterItemValue = function ($item) {
+        var customFieldData = $.extend(true, {}, $item.data('lcf-registered-data'));
+        switch (customFieldData.type) {
+            case 'text':
+            case 'number':
+            case 'email':
+            case 'password':
+            case 'image':
+            case 'file':
+                customFieldData.value = $item.find('> .repeater-item-input input').val();
+                break;
+            case 'wysiwyg':
+            case 'textarea':
+                customFieldData.value = $item.find('> .repeater-item-input textarea').val();
+                break;
+            case 'checkbox':
+                customFieldData.value = [];
+                $item.find('> .repeater-item-input input:checked').each(function () {
+                    customFieldData.value.push($(this).val());
+                });
+                break;
+            case 'radio':
+                customFieldData.value = $item.find('> .repeater-item-input input:checked').val();
+                break;
+            case 'select':
+                customFieldData.value = $item.find('> .repeater-item-input select').val();
+                break;
+            case 'repeater':
+                customFieldData.value = [];
+                var $repeaterItems = $item.find('> .repeater-item-input > .lcf-repeater > .field-group-items > li');
+                $repeaterItems.each(function () {
+                    var $current = $(this);
+                    var fieldGroup = $current.find('> .field-line-wrapper > .field-group');
+                    customFieldData.value.push(getRepeaterItemData(fieldGroup.find('> li')));
+                });
+                break;
+            default:
+                customFieldData = null;
+                break;
+        }
+        return customFieldData;
+    };
+
+    _self.$_EXPORT_TO.closest('form').on('submit', function (event) {
+        _self.$_EXPORT_TO.val(Helpers.jsonEncode(getFieldGroups()));
+    });
+};
+
+(function ($) {
+    $(document).ready(function () {
+        new UseCustomFields();
+    });
+})(jQuery);
+
+}((this.LaravelElixirBundle = this.LaravelElixirBundle || {})));
 //# sourceMappingURL=use-custom-fields.js.map

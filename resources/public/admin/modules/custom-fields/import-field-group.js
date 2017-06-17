@@ -1,2 +1,52 @@
-!function(e){"use strict";!function(e){var r=e("body");r.on("click",".trigger-import",function(r){var o=e(this).closest("form");o.find("input[type=file]").val("")}),r.on("change","form.import-field-group input[type=file]",function(r){var o=e(this).closest("form"),t=this.files[0];if(t){var a=new FileReader;a.readAsText(t),a.onload=function(r){var t=Helpers.jsonDecode(r.target.result);e.ajax({url:o.attr("action"),type:"POST",data:{json_data:t},dataType:"json",beforeSend:function(){WebEd.showLoading()},success:function(r){if(WebEd.showNotification(r.messages,r.error?"error":"success"),!r.error){var o=e("table.datatables")[0].dataTableHelper;o&&o.getDataTable().ajax.reload()}},complete:function(e){WebEd.hideLoading()},error:function(e){WebEd.showNotification("Some error occurred","error")}})}}})}(jQuery)}(this.LaravelElixirBundle=this.LaravelElixirBundle||{});
+(function (exports) {
+'use strict';
+
+(function ($) {
+    var $body = $('body');
+
+    $body.on('click', '.trigger-import', function (event) {
+        var $form = $(this).closest('form');
+        $form.find('input[type=file]').val('');
+    });
+
+    $body.on('change', 'form.import-field-group input[type=file]', function (event) {
+        var $form = $(this).closest('form');
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(e) {
+                var json = Helpers.jsonDecode(e.target.result);
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: {
+                        json_data: json,
+                    },
+                    dataType: 'json',
+                    beforeSend: function () {
+                        WebEd.showLoading();
+                    },
+                    success: function (res) {
+                        WebEd.showNotification(res.messages, (res.error ? 'error' : 'success'));
+                        if (!res.error) {
+                            var dataTableHelper = $('table.datatables')[0].dataTableHelper;
+                            if (dataTableHelper) {
+                                dataTableHelper.getDataTable().ajax.reload();
+                            }
+                        }
+                    },
+                    complete: function (data) {
+                        WebEd.hideLoading();
+                    },
+                    error: function (data) {
+                        WebEd.showNotification('Some error occurred', 'error');
+                    }
+                });
+            };
+        }
+    });
+}(jQuery));
+
+}((this.LaravelElixirBundle = this.LaravelElixirBundle || {})));
 //# sourceMappingURL=import-field-group.js.map

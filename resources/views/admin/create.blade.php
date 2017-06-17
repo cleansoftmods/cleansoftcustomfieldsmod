@@ -1,6 +1,6 @@
 @extends('webed-core::admin._master')
 
-@section('css')
+@section('head')
     <link rel="stylesheet" href="{{ asset('admin/modules/custom-fields/edit-field-group.css') }}">
 @endsection
 
