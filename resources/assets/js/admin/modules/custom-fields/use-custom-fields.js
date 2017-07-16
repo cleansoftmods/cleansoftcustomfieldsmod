@@ -102,7 +102,7 @@ class UseCustomFields {
                     choices.forEach(function (choice, index) {
                         $result.append('<option value="' + choice[0] + '">' + choice[1] + '</option>');
                     });
-                    $result.val(array_get(box, 'value', box.options.defaultValue));
+                    $result.val(Helpers.arrayGet(box, 'value', box.options.defaultValue));
                     $wrapper.append($result);
                     return $wrapper;
                 }
