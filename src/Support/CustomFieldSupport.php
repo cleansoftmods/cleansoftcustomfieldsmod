@@ -76,11 +76,31 @@ class CustomFieldSupport
             'slug' => $slug,
             'data' => []
         ];
-        if (is_object($data)) {
-            $this->ruleGroups[$group]['items'][$slug]['data'] = $data;
-        } else {
-            $this->ruleGroups[$group]['items'][$slug]['data'] = array_merge($this->ruleGroups[$group]['items'][$slug]['data'], $data);
+
+        $this->ruleGroups[$group]['items'][$slug]['data'][] = $data;
+
+        return $this;
+    }
+
+    /**
+     * @param string $group
+     * @param string $title
+     * @param string $slug
+     * @param \Closure|array $data
+     * @return $this
+     */
+    public function expandRule($group, $title, $slug, $data)
+    {
+        if (!isset($this->ruleGroups[$group]['items'][$slug]['data']) || !$this->ruleGroups[$group]['items'][$slug]['data']) {
+            return $this->registerRule($group, $title, $slug, $data);
         }
+
+        if (!is_array($data)) {
+            $data = [$data];
+        }
+
+        $this->ruleGroups[$group]['items'][$slug]['data'] = array_merge($this->ruleGroups[$group]['items'][$slug]['data'], $data);
+
         return $this;
     }
 
@@ -92,12 +112,14 @@ class CustomFieldSupport
     {
         foreach ($this->ruleGroups as $groupKey => &$group) {
             foreach ($group['items'] as $type => &$item) {
-                if ($item['data'] instanceof \Closure) {
-                    $item['data'] = call_user_func($item['data']);
+                $mergedData = [];
+                foreach ($item['data'] as &$data) {
+                    if ($data instanceof \Closure) {
+                        $data = call_user_func($data);
+                        $mergedData = array_merge($mergedData, $data);
+                    }
                 }
-                if (!is_array($item['data'])) {
-                    $item['data'] = [];
-                }
+                $item['data'] = $mergedData;
             }
         }
         return $this->ruleGroups;

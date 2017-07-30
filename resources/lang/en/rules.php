@@ -11,4 +11,6 @@ return [
     'page_template' => 'Page template',
     'page' => 'Page',
     'model_name' => 'Model name',
+
+    'model_name_page' => 'Page',
 ];
