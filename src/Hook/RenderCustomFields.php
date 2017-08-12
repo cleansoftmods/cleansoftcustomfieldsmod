@@ -3,21 +3,15 @@
 use WebEd\Base\CustomFields\Facades\CustomFieldSupportFacade;
 use WebEd\Base\Models\Contracts\BaseModelContract;
 use WebEd\Base\Models\EloquentBase;
-use WebEd\Base\Users\Models\User;
 
 class RenderCustomFields
 {
     public function __construct()
     {
-        /**
-         * @var User $loggedInUser
-         */
-        $loggedInUser = auth()->user();
-
-        $roles = $loggedInUser->roles()->pluck('id')->toArray();
+        $roles = check_user_acl()->getRoles(get_current_logged_user_id());
 
         add_custom_fields_rules_to_check([
-            'logged_in_user' => $loggedInUser->id,
+            'logged_in_user' => get_current_logged_user_id(),
             'logged_in_user_has_role' => $roles
         ]);
     }

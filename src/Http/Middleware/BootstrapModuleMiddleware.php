@@ -57,11 +57,11 @@ class BootstrapModuleMiddleware
             ->registerRule('other', trans('webed-custom-fields::rules.logged_in_user_has_role'), 'logged_in_user_has_role', function () {
                 $repository = app(\WebEd\Base\ACL\Repositories\Contracts\RoleRepositoryContract::class);
 
-                $roles = $repository->get();
+                $roles = $repository->get(['id', 'name', 'slug']);
 
                 $rolesArr = [];
                 foreach ($roles as $role) {
-                    $rolesArr[$role->id] = $role->name . ' - (' . $role->slug . ')';
+                    $rolesArr[$role->slug] = $role->name . ' - (' . $role->slug . ')';
                 }
 
                 return $rolesArr;
