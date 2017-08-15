@@ -13,7 +13,11 @@
 @endsection
 
 @section('content')
-    {!! Form::open(['class' => 'js-validate-form form-update-field-group']) !!}
+    {!! form()->open([
+        'class' => 'js-validate-form form-update-field-group',
+        'novalidate' => 'novalidate',
+        'url' => request()->fullUrl(),
+    ]) !!}
     <textarea name="field_group[rules]"
               id="custom_fields_rules"
               class="form-control hidden"
@@ -125,5 +129,5 @@
             </div>
         </div>
     </div>
-    {!! Form::close() !!}
+    {!! form()->close() !!}
 @endsection
