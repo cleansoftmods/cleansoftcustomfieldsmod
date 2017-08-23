@@ -5,7 +5,7 @@ use WebEd\Base\Models\EloquentBase as BaseModel;
 
 class FieldGroup extends BaseModel implements FieldGroupModelContract
 {
-    protected $table = 'field_groups';
+    protected $table = 'we_field_groups';
 
     protected $primaryKey = 'id';
 

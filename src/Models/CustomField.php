@@ -5,7 +5,7 @@ use WebEd\Base\Models\EloquentBase as BaseModel;
 
 class CustomField extends BaseModel implements CustomFieldModelContract
 {
-    protected $table = 'custom_fields';
+    protected $table = 'we_custom_fields';
 
     protected $primaryKey = 'id';
 
