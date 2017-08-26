@@ -1,13 +1,16 @@
 <?php namespace WebEd\Base\CustomFields\Http\Controllers;
 
 use Illuminate\Http\Request;
+use WebEd\Base\CustomFields\Actions\CreateCustomFieldAction;
+use WebEd\Base\CustomFields\Actions\DeleteCustomFieldAction;
+use WebEd\Base\CustomFields\Actions\ExportCustomFieldsAction;
+use WebEd\Base\CustomFields\Actions\ImportCustomFieldsAction;
+use WebEd\Base\CustomFields\Actions\UpdateCustomFieldAction;
 use WebEd\Base\CustomFields\Http\DataTables\FieldGroupsListDataTable;
 use WebEd\Base\CustomFields\Http\Requests\CreateFieldGroupRequest;
 use WebEd\Base\CustomFields\Http\Requests\UpdateFieldGroupRequest;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
-use WebEd\Base\CustomFields\Support\ExportCustomFields;
-use WebEd\Base\CustomFields\Support\ImportCustomFields;
 use WebEd\Base\Http\Controllers\BaseAdminController;
 use WebEd\Base\Http\DataTables\AbstractDataTables;
 use Yajra\Datatables\Engines\BaseEngine;
@@ -92,17 +95,20 @@ class CustomFieldController extends BaseAdminController
                         ];
                     }
 
-                    $ids = do_filter(BASE_FILTER_BEFORE_DELETE, $ids, WEBED_CUSTOM_FIELDS);
-
-                    $result = $this->repository->deleteFieldGroup($ids);
-
-                    do_action(BASE_ACTION_AFTER_DELETE, WEBED_CUSTOM_FIELDS, $ids, $result);
+                    $action = app(DeleteCustomFieldAction::class);
+                    foreach ($ids as $id) {
+                        $this->deleteDelete($action, $id);
+                    }
                     break;
-                case 'activated':
-                case 'disabled':
-                    $result = $this->repository->updateMultiple($ids, [
-                        'status' => $actionValue,
-                    ]);
+                case 1:
+                case 0:
+                    $action = app(UpdateCustomFieldAction::class);
+
+                    foreach ($ids as $id) {
+                        $action->run($id, [
+                            'status' => $actionValue,
+                        ]);
+                    }
                     break;
                 default:
                     return [
@@ -111,9 +117,8 @@ class CustomFieldController extends BaseAdminController
                     ];
                     break;
             }
-            $data['customActionMessage'] = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
-            $data['customActionStatus'] = !$result ? 'danger' : 'success';
-
+            $data['customActionMessage'] = trans('webed-core::base.form.request_completed');
+            $data['customActionStatus'] = 'success';
         }
         return $data;
     }
@@ -124,15 +129,15 @@ class CustomFieldController extends BaseAdminController
      * @param $status
      * @return \Illuminate\Http\JsonResponse
      */
-    public function postUpdateStatus($id, $status)
+    public function postUpdateStatus(UpdateCustomFieldAction $action, $id, $status)
     {
         $data = [
             'status' => $status
         ];
-        $result = $this->repository->update($id, $data);
-        $msg = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
-        $code = $result ? \Constants::SUCCESS_NO_CONTENT_CODE : \Constants::ERROR_CODE;
-        return response()->json(response_with_messages($msg, !$result, $code), $code);
+
+        $result = $action->run($id, $data);
+
+        return response()->json($result, $result['response_code']);
     }
 
     /**
@@ -148,21 +153,23 @@ class CustomFieldController extends BaseAdminController
         return do_filter(BASE_FILTER_CONTROLLER, $this, WEBED_CUSTOM_FIELDS, 'create.get')->viewAdmin('create');
     }
 
-    public function postCreate(CreateFieldGroupRequest $request)
+    /**
+     * @param CreateFieldGroupRequest $request
+     * @param CreateCustomFieldAction $action
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postCreate(CreateFieldGroupRequest $request, CreateCustomFieldAction $action)
     {
-        do_action(BASE_ACTION_BEFORE_CREATE, WEBED_CUSTOM_FIELDS, 'create.post');
+        $data = array_merge($request->get('field_group', []), [
+            'created_by' => $this->loggedInUser->id,
+        ]);
 
-        $data['created_by'] = $this->loggedInUser->id;
+        $result = $action->run($data);
 
-        $result = $this->repository->createFieldGroup($request->get('field_group', []));
-
-        do_action(BASE_ACTION_AFTER_CREATE, WEBED_CUSTOM_FIELDS, $result);
-
-        $msgType = !$result ? 'danger' : 'success';
-        $msg = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
+        $msgType = $result['error'] ? 'danger' : 'success';
 
         flash_messages()
-            ->addMessages($msg, $msgType)
+            ->addMessages($result['messages'], $msgType)
             ->showMessagesOnSession();
 
         if (!$result) {
@@ -170,7 +177,7 @@ class CustomFieldController extends BaseAdminController
         }
 
         if ($this->request->has('_continue_edit')) {
-            return redirect()->to(route('admin::custom-fields.field-group.edit.get', ['id' => $result]));
+            return redirect()->to(route('admin::custom-fields.field-group.edit.get', ['id' => $result['data']['id']]));
         }
 
         return redirect()->to(route('admin::custom-fields.index.get'));
@@ -184,6 +191,8 @@ class CustomFieldController extends BaseAdminController
     {
         $item = $this->repository->find($id);
 
+        $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.get');
+
         if (!$item) {
             flash_messages()
                 ->addMessages(trans($this->module . '::base.item_not_exists'), 'danger')
@@ -191,8 +200,6 @@ class CustomFieldController extends BaseAdminController
 
             return redirect()->back();
         }
-
-        $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.get');
 
         $this->setPageTitle(trans($this->module . '::base.form.edit_field_group') . ' #' . $item->id);
         $this->breadcrumbs->addLink(trans($this->module . '::base.form.edit_field_group'));
@@ -208,32 +215,21 @@ class CustomFieldController extends BaseAdminController
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function postEdit(UpdateFieldGroupRequest $request, $id)
+    public function postEdit(UpdateFieldGroupRequest $request, UpdateCustomFieldAction $action, $id)
     {
-        $item = $this->repository->find($id);
+        $data = array_merge($request->get('field_group', []), [
+            'updated_by' => $this->loggedInUser->id,
+        ]);
 
-        if (!$item) {
-            flash_messages()
-                ->addMessages(trans('webed-core::base.item_not_exists'), 'danger')
-                ->showMessagesOnSession();
+        $result = $action->run($id, $data);
 
-            return redirect()->back();
-        }
-
-        $item = do_filter(BASE_FILTER_BEFORE_UPDATE, $item, WEBED_CUSTOM_FIELDS, 'edit.post');
-
-        $result = $this->repository->updateFieldGroup($item, $request->get('field_group'));
-
-        do_action(BASE_ACTION_AFTER_UPDATE, WEBED_CUSTOM_FIELDS, $id, $result);
-
-        $msgType = !$result ? 'danger' : 'success';
-        $msg = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
+        $msgType = $result['error'] ? 'danger' : 'success';
 
         flash_messages()
-            ->addMessages($msg, $msgType)
+            ->addMessages($result['messages'], $msgType)
             ->showMessagesOnSession();
 
-        if ($this->request->has('_continue_edit')) {
+        if ($result['error'] || $this->request->has('_continue_edit')) {
             return redirect()->back();
         }
 
@@ -241,41 +237,47 @@ class CustomFieldController extends BaseAdminController
     }
 
     /**
+     * @param DeleteCustomFieldAction $action
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteDelete($id)
+    public function deleteDelete(DeleteCustomFieldAction $action, $id)
     {
-        $id = do_filter(BASE_FILTER_BEFORE_DELETE, $id, WEBED_CUSTOM_FIELDS);
+        $result = $action->run($id);
 
-        $result = $this->repository->deleteFieldGroup($id);
-
-        do_action(BASE_ACTION_AFTER_DELETE, WEBED_CUSTOM_FIELDS, $id, $result);
-
-        $msg = $result ? trans('webed-core::base.form.request_completed') : trans('webed-core::base.form.error_occurred');
-        $code = $result ? \Constants::SUCCESS_NO_CONTENT_CODE : \Constants::ERROR_CODE;
-        return response()->json(response_with_messages($msg, !$result, $code), $code);
+        return response()->json($result, $result['response_code']);
     }
 
     /**
-     * @param ExportCustomFields $exportSupport
+     * @param ExportCustomFieldsAction $action
+     * @param null $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getExport(ExportCustomFields $exportSupport)
+    public function getExport(ExportCustomFieldsAction $action, $id = null)
     {
         $ids = [];
-        foreach ($this->repository->get(['id']) as $item) {
-            $ids[] = $item->id;
+
+        if (!$id) {
+            foreach ($this->repository->get(['id']) as $item) {
+                $ids[] = $item->id;
+            }
+        } else {
+            $ids[] = $id;
         }
-        $json = $exportSupport->export($ids);
+
+        $json = $action->run($ids)['data'];
+
         return response()->json($json, \Constants::SUCCESS_CODE, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
-    public function postImport(ImportCustomFields $importCustomFields)
+    /**
+     * @param ImportCustomFieldsAction $action
+     * @return array
+     */
+    public function postImport(ImportCustomFieldsAction $action)
     {
         $json = $this->request->get('json_data');
-        $result = $importCustomFields->import($json);
-        $message = $result ? 'Field group imported' : 'Error occurred when import field group';
-        return response_with_messages($message, !$result, ($result ? \Constants::SUCCESS_NO_CONTENT_CODE : \Constants::ERROR_CODE));
+
+        return $action->run($json);
     }
 }

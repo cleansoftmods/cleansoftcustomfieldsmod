@@ -12,7 +12,7 @@ class UpdateFieldGroupRequest extends Request
             'field_group.group_items' => 'json|required',
             'field_group.deleted_items' => 'json|nullable',
             'field_group.title' => 'string|required|max:255',
-            'field_group.status' => 'required|in:activated,disabled',
+            'field_group.status' => 'required',
         ];
     }
 }

@@ -58,8 +58,8 @@
                             <b>{{ trans('webed-core::base.form.status') }}</b>
                         </label>
                         {!! form()->select('field_group[status]', [
-                           'activated' => trans('webed-core::base.status.activated'),
-                            'disabled' => trans('webed-core::base.status.disabled'),
+                           1 => trans('webed-core::base.status.activated'),
+                           0 => trans('webed-core::base.status.disabled'),
                         ], old('field_group.status'), ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group">

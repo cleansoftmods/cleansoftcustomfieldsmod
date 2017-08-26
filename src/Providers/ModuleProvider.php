@@ -1,7 +1,5 @@
 <?php namespace WebEd\Base\CustomFields\Providers;
 
-use WebEd\Base\CustomFields\Http\Middleware\BootstrapModuleMiddleware;
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class ModuleProvider extends ServiceProvider
@@ -59,11 +57,5 @@ class ModuleProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(RepositoryServiceProvider::class);
         $this->app->register(HookServiceProvider::class);
-
-        /**
-         * @var Router $router
-         */
-        $router = $this->app['router'];
-        $router->pushMiddlewareToGroup('web', BootstrapModuleMiddleware::class);
     }
 }

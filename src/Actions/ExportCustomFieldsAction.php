@@ -1,11 +1,12 @@
-<?php namespace WebEd\Base\CustomFields\Support;
+<?php namespace WebEd\Base\CustomFields\Actions;
 
+use WebEd\Base\Actions\AbstractAction;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldItemRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
 use WebEd\Base\CustomFields\Repositories\FieldItemRepository;
 
-class ExportCustomFields
+class ExportCustomFieldsAction extends AbstractAction
 {
     /**
      * @var FieldGroupRepository
@@ -31,19 +32,25 @@ class ExportCustomFields
      * @param array $fieldGroupIds
      * @return array
      */
-    public function export(array $fieldGroupIds)
+    public function run(array $fieldGroupIds)
     {
-        $fieldGroups = $this->fieldGroupRepository
-            ->getWhere([
-                ['id', 'IN', $fieldGroupIds]
-            ], ['id', 'title', 'status', 'order', 'rules'])
-            ->toArray();
+        if (!$fieldGroupIds) {
+            $fieldGroups = $this->fieldGroupRepository
+                ->get(['id', 'title', 'status', 'order', 'rules'])
+                ->toArray();
+        } else {
+            $fieldGroups = $this->fieldGroupRepository
+                ->getWhere([
+                    ['id', 'IN', $fieldGroupIds]
+                ], ['id', 'title', 'status', 'order', 'rules'])
+                ->toArray();
+        }
 
         foreach ($fieldGroups as &$fieldGroup) {
             $fieldGroup['items'] = $this->getFieldItems($fieldGroup['id']);
         }
 
-        return $fieldGroups;
+        return $this->success(null, $fieldGroups);
     }
 
     /**

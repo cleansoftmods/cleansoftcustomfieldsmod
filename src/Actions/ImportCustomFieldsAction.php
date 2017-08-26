@@ -1,12 +1,13 @@
-<?php namespace WebEd\Base\CustomFields\Support;
+<?php namespace WebEd\Base\CustomFields\Actions;
 
+use WebEd\Base\Actions\AbstractAction;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\Contracts\FieldItemRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
 use WebEd\Base\CustomFields\Repositories\FieldItemRepository;
 use Illuminate\Support\Facades\DB;
 
-class ImportCustomFields
+class ImportCustomFieldsAction extends AbstractAction
 {
     /**
      * @var FieldGroupRepository
@@ -28,7 +29,11 @@ class ImportCustomFields
         $this->fieldItemRepository = $fieldItemRepository;
     }
 
-    public function import(array $fieldGroupsData)
+    /**
+     * @param array $fieldGroupsData
+     * @return array
+     */
+    public function run(array $fieldGroupsData)
     {
         DB::beginTransaction();
         foreach ($fieldGroupsData as $fieldGroup) {
@@ -36,16 +41,16 @@ class ImportCustomFields
                 ->create($fieldGroup);
             if (!$id) {
                 DB::rollBack();
-                return false;
+                return $this->error();
             }
             $createItems = $this->createFieldItem(array_get($fieldGroup, 'items', []), $id);
             if (!$createItems) {
                 DB::rollBack();
-                return false;
+                return $this->error();
             }
         }
         DB::commit();
-        return true;
+        return $this->success();
     }
 
     protected function createFieldItem(array $items, $fieldGroupId, $parentId = null)

@@ -32,9 +32,12 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">{{ trans('webed-core::base.form.basic_info') }}</h3>
                     <div class="box-tools">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                    class="fa fa-minus"></i>
-                        </button>
+                        <a href="{{ route('admin::custom-fields.field-group.export.get', ['id' => $object->id]) }}"
+                           class="btn btn-sm purple"
+                           download="{{ $object->title }}">
+                            <i class="fa fa-download"></i>
+                            {{ trans('webed-custom-fields::base.export') }}
+                        </a>
                     </div>
                 </div>
                 <div class="box-body">
@@ -54,8 +57,8 @@
                             <b>{{ trans('webed-core::base.form.status') }}</b>
                         </label>
                         {!! form()->select('field_group[status]', [
-                           'activated' => trans('webed-core::base.status.activated'),
-                            'disabled' => trans('webed-core::base.status.disabled'),
+                           1 => trans('webed-core::base.status.activated'),
+                           0 => trans('webed-core::base.status.disabled'),
                         ], $object->status, ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group">

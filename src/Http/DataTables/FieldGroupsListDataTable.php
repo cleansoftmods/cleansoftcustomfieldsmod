@@ -72,15 +72,15 @@ class FieldGroupsListDataTable extends AbstractDataTables
             ]))
             ->addFilter(2, form()->select('status', [
                 '' => trans('webed-core::datatables.select') . '...',
-                'activated' => trans('webed-core::base.status.activated'),
-                'disabled' => trans('webed-core::base.status.disabled'),
+                1 => trans('webed-core::base.status.activated'),
+                0 => trans('webed-core::base.status.disabled'),
             ], null, ['class' => 'form-control form-filter input-sm']));
 
         $this->withGroupActions([
             '' => trans('webed-core::datatables.select') . '...',
             'deleted' => trans('webed-core::datatables.delete_these_items'),
-            'activated' => trans('webed-core::datatables.active_these_items'),
-            'disabled' => trans('webed-core::datatables.disable_these_items'),
+            1 => trans('webed-core::base.status.activated'),
+            0 => trans('webed-core::base.status.disabled'),
         ]);
 
         return $this->view();
@@ -97,17 +97,18 @@ class FieldGroupsListDataTable extends AbstractDataTables
                 return form()->customCheckbox([['id[]', $item->id]]);
             })
             ->editColumn('status', function ($item) {
-                return html()->label(trans('webed-core::base.status.' . $item->status), $item->status);
+                $status = $item->status ? 'activated' : 'disabled';
+                return html()->label(trans('webed-core::base.status.' . $status), $status);
             })
             ->addColumn('actions', function ($item) {
                 /*Edit link*/
-                $activeLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 'activated']);
-                $disableLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 'disabled']);
+                $activeLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 1]);
+                $disableLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 0]);
                 $deleteLink = route('admin::custom-fields.field-group.delete.delete', ['id' => $item->id]);
 
                 /*Buttons*/
                 $editBtn = link_to(route('admin::custom-fields.field-group.edit.get', ['id' => $item->id]), trans('webed-core::datatables.edit'), ['class' => 'btn btn-sm btn-outline green']);
-                $activeBtn = ($item->status != 'activated') ? form()->button(trans('webed-core::datatables.active'), [
+                $activeBtn = ($item->status != 1) ? form()->button(trans('webed-core::datatables.active'), [
                     'title' => trans('webed-core::datatables.active_this_item'),
                     'data-ajax' => $activeLink,
                     'data-method' => 'POST',
@@ -115,7 +116,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
                     'class' => 'btn btn-outline blue btn-sm ajax-link',
                     'type' => 'button',
                 ]) : '';
-                $disableBtn = ($item->status != 'disabled') ? form()->button(trans('webed-core::datatables.disable'), [
+                $disableBtn = ($item->status != 0) ? form()->button(trans('webed-core::datatables.disable'), [
                     'title' => trans('webed-core::datatables.disable_this_item'),
                     'data-ajax' => $disableLink,
                     'data-method' => 'POST',
@@ -131,8 +132,13 @@ class FieldGroupsListDataTable extends AbstractDataTables
                     'class' => 'btn btn-outline red-sunglo btn-sm ajax-link',
                     'type' => 'button',
                 ]);
+                $exportBtn = link_to(
+                    route('admin::custom-fields.field-group.export.get', ['id' => $item->id]),
+                    trans('webed-custom-fields::base.export'),
+                    ['class' => 'btn btn-sm btn-outline purple', 'download' => $item->title]
+                );
 
-                return $editBtn . $activeBtn . $disableBtn . $deleteBtn;
+                return $editBtn . $activeBtn . $disableBtn . $deleteBtn . $exportBtn;
             });
     }
 }

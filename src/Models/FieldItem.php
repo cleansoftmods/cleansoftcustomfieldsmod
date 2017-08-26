@@ -5,7 +5,7 @@ use WebEd\Base\Models\EloquentBase as BaseModel;
 
 class FieldItem extends BaseModel implements FieldItemModelContract
 {
-    protected $table = 'we_field_items';
+    protected $table = 'field_items';
 
     protected $primaryKey = 'id';
 
