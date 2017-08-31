@@ -211,7 +211,7 @@ class CustomFieldSupport
     public function exportCustomFieldsData($morphClass, $morphId)
     {
         $fieldGroups = $this->fieldGroupRepository->getFieldGroups([
-            'status' => 'activated'
+            'status' => 1
         ]);
 
         $result = [];

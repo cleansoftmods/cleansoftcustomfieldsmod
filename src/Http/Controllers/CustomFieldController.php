@@ -131,11 +131,9 @@ class CustomFieldController extends BaseAdminController
      */
     public function postUpdateStatus(UpdateCustomFieldAction $action, $id, $status)
     {
-        $data = [
+        $result = $action->run($id, [
             'status' => $status
-        ];
-
-        $result = $action->run($id, $data);
+        ]);
 
         return response()->json($result, $result['response_code']);
     }

@@ -31,10 +31,6 @@ class ModuleProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../resources/public' => public_path(),
         ], 'webed-public-assets');
-
-        app()->booted(function () {
-            $this->app->register(BootstrapModuleServiceProvider::class);
-        });
     }
 
     /**
@@ -57,5 +53,6 @@ class ModuleProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(RepositoryServiceProvider::class);
         $this->app->register(HookServiceProvider::class);
+        $this->app->register(BootstrapModuleServiceProvider::class);
     }
 }
