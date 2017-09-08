@@ -103,7 +103,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
                 /*Edit link*/
                 $activeLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 'activated']);
                 $disableLink = route('admin::custom-fields.field-group.update-status.post', ['id' => $item->id, 'status' => 'disabled']);
-                $deleteLink = route('admin::custom-fields.field-group.delete.delete', ['id' => $item->id]);
+                $deleteLink = route('admin::custom-fields.field-group.delete.post', ['id' => $item->id]);
 
                 /*Buttons*/
                 $editBtn = link_to(route('admin::custom-fields.field-group.edit.get', ['id' => $item->id]), trans('webed-core::datatables.edit'), ['class' => 'btn btn-sm btn-outline green']);
@@ -126,7 +126,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
                 $deleteBtn = form()->button(trans('webed-core::datatables.delete'), [
                     'title' => trans('webed-core::datatables.delete_this_item'),
                     'data-ajax' => $deleteLink,
-                    'data-method' => 'DELETE',
+                    'data-method' => 'POST',
                     'data-toggle' => 'confirmation',
                     'class' => 'btn btn-outline red-sunglo btn-sm ajax-link',
                     'type' => 'button',
