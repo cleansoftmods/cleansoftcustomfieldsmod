@@ -60,7 +60,7 @@ class StoreCustomFields
      */
     protected function saveCustomFields($screenName, $id)
     {
-        $data = $this->parseRawData($this->request->get('custom_fields', []));
+        $data = $this->parseRawData($this->request->input('custom_fields', []));
         foreach ($data as $row) {
             $this->saveCustomField($screenName, $id, $row);
         }

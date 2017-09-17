@@ -75,7 +75,7 @@ class CustomFieldController extends BaseAdminController
     protected function groupAction()
     {
         $data = [];
-        if ($this->request->get('customActionType', null) === 'group_action') {
+        if ($this->request->input('customActionType', null) === 'group_action') {
             if (!$this->userRepository->hasPermission($this->loggedInUser, ['edit-field-groups'])) {
                 return [
                     'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
@@ -83,8 +83,8 @@ class CustomFieldController extends BaseAdminController
                 ];
             }
 
-            $ids = (array)$this->request->get('id', []);
-            $actionValue = $this->request->get('customActionValue');
+            $ids = (array)$this->request->input('id', []);
+            $actionValue = $this->request->input('customActionValue');
 
             switch ($actionValue) {
                 case 'deleted':
@@ -97,7 +97,7 @@ class CustomFieldController extends BaseAdminController
 
                     $action = app(DeleteCustomFieldAction::class);
                     foreach ($ids as $id) {
-                        $this->deleteDelete($action, $id);
+                        $this->postDelete($action, $id);
                     }
                     break;
                 case 1:
@@ -158,9 +158,7 @@ class CustomFieldController extends BaseAdminController
      */
     public function postCreate(CreateFieldGroupRequest $request, CreateCustomFieldAction $action)
     {
-        $data = array_merge($request->get('field_group', []), [
-            'created_by' => $this->loggedInUser->id,
-        ]);
+        $data = $request->input('field_group', []);
 
         $result = $action->run($data);
 
@@ -215,9 +213,7 @@ class CustomFieldController extends BaseAdminController
      */
     public function postEdit(UpdateFieldGroupRequest $request, UpdateCustomFieldAction $action, $id)
     {
-        $data = array_merge($request->get('field_group', []), [
-            'updated_by' => $this->loggedInUser->id,
-        ]);
+        $data = $request->input('field_group', []);
 
         $result = $action->run($id, $data);
 
@@ -239,7 +235,7 @@ class CustomFieldController extends BaseAdminController
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteDelete(DeleteCustomFieldAction $action, $id)
+    public function postDelete(DeleteCustomFieldAction $action, $id)
     {
         $result = $action->run($id);
 
@@ -274,7 +270,7 @@ class CustomFieldController extends BaseAdminController
      */
     public function postImport(ImportCustomFieldsAction $action)
     {
-        $json = $this->request->get('json_data');
+        $json = $this->request->input('json_data');
 
         return $action->run($json);
     }

@@ -37,6 +37,7 @@ class ImportCustomFieldsAction extends AbstractAction
     {
         DB::beginTransaction();
         foreach ($fieldGroupsData as $fieldGroup) {
+            $fieldGroup['created_by'] = get_current_logged_user_id();
             $id = $this->fieldGroupRepository
                 ->create($fieldGroup);
             if (!$id) {
@@ -58,6 +59,7 @@ class ImportCustomFieldsAction extends AbstractAction
         foreach ($items as $item) {
             $item['field_group_id'] = $fieldGroupId;
             $item['parent_id'] = $parentId;
+            $item['created_by'] = get_current_logged_user_id();
             $id = $this->fieldItemRepository
                 ->create($item);
             if (!$id) {

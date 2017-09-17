@@ -23,12 +23,13 @@ class ModuleProvider extends ServiceProvider
             __DIR__ . '/../../resources/lang' => base_path('resources/lang/vendor/webed-custom-fields'),
         ], 'lang');
         $this->publishes([
-            __DIR__ . '/../../database' => base_path('database'),
-        ], 'migrations');
+            __DIR__ . '/../../config' => base_path('config'),
+        ], 'config');
         $this->publishes([
             __DIR__ . '/../../resources/assets' => resource_path('assets'),
         ], 'webed-assets');
         $this->publishes([
+            __DIR__ . '/../../resources/root' => base_path(),
             __DIR__ . '/../../resources/public' => public_path(),
         ], 'webed-public-assets');
     }
