@@ -31,11 +31,11 @@ class RenderCustomFields
         }
 
         switch ($screenName) {
-            case WEBED_PAGES:
+            case 'webed-pages':
                 add_custom_fields_rules_to_check([
                     'page_template' => isset($object->page_template) ? $object->page_template : '',
                     'page' => isset($object->id) ? $object->id : '',
-                    'model_name' => WEBED_PAGES,
+                    'model_name' => 'webed-pages',
                 ]);
                 break;
         }

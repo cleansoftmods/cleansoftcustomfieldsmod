@@ -77,7 +77,7 @@ class CustomFieldSupport
             'data' => []
         ];
 
-        $this->ruleGroups[$group]['items'][$slug]['data'][] = $data;
+        $this->ruleGroups[$group]['items'][$slug]['data'] = $data;
 
         return $this;
     }
@@ -112,16 +112,12 @@ class CustomFieldSupport
     {
         foreach ($this->ruleGroups as $groupKey => &$group) {
             foreach ($group['items'] as $type => &$item) {
-                $mergedData = [];
-                foreach ($item['data'] as &$data) {
-                    if ($data instanceof \Closure) {
-                        $data = call_user_func($data);
-                        $mergedData = array_merge($mergedData, $data);
-                    }
+                if ($item['data'] instanceof \Closure) {
+                    $item['data'] = call_user_func($item['data']);
                 }
-                $item['data'] = $mergedData;
             }
         }
+
         return $this->ruleGroups;
     }
 
