@@ -13,7 +13,6 @@ use WebEd\Base\CustomFields\Repositories\Contracts\FieldGroupRepositoryContract;
 use WebEd\Base\CustomFields\Repositories\FieldGroupRepository;
 use WebEd\Base\Http\Controllers\BaseAdminController;
 use WebEd\Base\Http\DataTables\AbstractDataTables;
-use Yajra\Datatables\Engines\BaseEngine;
 
 class CustomFieldController extends BaseAdminController
 {
@@ -43,7 +42,7 @@ class CustomFieldController extends BaseAdminController
     }
 
     /**
-     * @param AbstractDataTables|BaseEngine $dataTables
+     * @param AbstractDataTables $dataTables
      * @return @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getIndex(FieldGroupsListDataTable $dataTables)
@@ -58,69 +57,12 @@ class CustomFieldController extends BaseAdminController
     }
 
     /**
-     * @param AbstractDataTables|BaseEngine $dataTables
+     * @param AbstractDataTables $dataTables
      * @return mixed
      */
     public function postListing(FieldGroupsListDataTable $dataTables)
     {
-        $data = $dataTables->with($this->groupAction());
-
-        return do_filter(BASE_FILTER_CONTROLLER, $data, WEBED_CUSTOM_FIELDS, 'index.post', $this);
-    }
-
-    /**
-     * Handle group actions
-     * @return array
-     */
-    protected function groupAction()
-    {
-        $data = [];
-        if ($this->request->input('customActionType', null) === 'group_action') {
-            if (!$this->userRepository->hasPermission($this->loggedInUser, ['edit-field-groups'])) {
-                return [
-                    'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
-                    'customActionStatus' => 'danger',
-                ];
-            }
-
-            $ids = (array)$this->request->input('id', []);
-            $actionValue = $this->request->input('customActionValue');
-
-            switch ($actionValue) {
-                case 'deleted':
-                    if (!$this->userRepository->hasPermission($this->loggedInUser, ['delete-field-groups'])) {
-                        return [
-                            'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
-                            'customActionStatus' => 'danger',
-                        ];
-                    }
-
-                    $action = app(DeleteCustomFieldAction::class);
-                    foreach ($ids as $id) {
-                        $this->postDelete($action, $id);
-                    }
-                    break;
-                case 1:
-                case 0:
-                    $action = app(UpdateCustomFieldAction::class);
-
-                    foreach ($ids as $id) {
-                        $action->run($id, [
-                            'status' => $actionValue,
-                        ]);
-                    }
-                    break;
-                default:
-                    return [
-                        'customActionMessage' => trans('webed-core::errors.' . \Constants::METHOD_NOT_ALLOWED . '.message'),
-                        'customActionStatus' => 'danger'
-                    ];
-                    break;
-            }
-            $data['customActionMessage'] = trans('webed-core::base.form.request_completed');
-            $data['customActionStatus'] = 'success';
-        }
-        return $data;
+        return do_filter(BASE_FILTER_CONTROLLER, $dataTables, WEBED_CUSTOM_FIELDS, 'index.post', $this);
     }
 
     /**

@@ -1,21 +1,26 @@
 <?php namespace WebEd\Base\CustomFields\Http\DataTables;
 
+use WebEd\Base\CustomFields\Actions\DeleteCustomFieldAction;
+use WebEd\Base\CustomFields\Actions\UpdateCustomFieldAction;
 use WebEd\Base\CustomFields\Models\FieldGroup;
 use WebEd\Base\Http\DataTables\AbstractDataTables;
-use Yajra\Datatables\Engines\CollectionEngine;
-use Yajra\Datatables\Engines\EloquentEngine;
-use Yajra\Datatables\Engines\QueryBuilderEngine;
 
 class FieldGroupsListDataTable extends AbstractDataTables
 {
     protected $model;
 
+    protected $screenName = WEBED_CUSTOM_FIELDS;
+
     public function __construct()
     {
-        $this->model = FieldGroup::select(['id', 'title', 'status', 'order', 'created_at', 'updated_at']);
+        $this->model = do_filter(
+            FRONT_FILTER_DATA_TABLES_MODEL,
+            FieldGroup::select(['id', 'title', 'status', 'order', 'created_at', 'updated_at']),
+            $this->screenName
+        );
     }
 
-    public function headings()
+    public function headings(): array
     {
         return [
             'title' => [
@@ -45,7 +50,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
         ];
     }
 
-    public function columns()
+    public function columns(): array
     {
         return [
             ['data' => 'id', 'name' => 'id', 'searchable' => false, 'orderable' => false],
@@ -61,7 +66,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
     /**
      * @return string
      */
-    public function run()
+    public function run(): string
     {
         $this->setAjaxUrl(route('admin::custom-fields.index.post'), 'POST');
 
@@ -87,7 +92,7 @@ class FieldGroupsListDataTable extends AbstractDataTables
     }
 
     /**
-     * @return CollectionEngine|EloquentEngine|QueryBuilderEngine|mixed
+     * @return mixed
      */
     protected function fetchDataForAjax()
     {
@@ -140,5 +145,64 @@ class FieldGroupsListDataTable extends AbstractDataTables
 
                 return $editBtn . $activeBtn . $disableBtn . $deleteBtn . $exportBtn;
             });
+    }
+
+    /**
+     * Handle group actions
+     * @return array
+     */
+    protected function groupAction(): array
+    {
+        $request = request();
+
+        $data = [];
+
+        if ($request->input('customActionType', null) === 'group_action') {
+            if (!has_permissions(get_current_logged_user(), ['edit-field-groups'])) {
+                return [
+                    'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
+                    'customActionStatus' => 'danger',
+                ];
+            }
+
+            $ids = (array)$request->input('id', []);
+            $actionValue = $request->input('customActionValue');
+
+            switch ($actionValue) {
+                case 'deleted':
+                    if (!has_permissions(get_current_logged_user(), ['delete-field-groups'])) {
+                        return [
+                            'customActionMessage' => trans('webed-acl::base.do_not_have_permission'),
+                            'customActionStatus' => 'danger',
+                        ];
+                    }
+
+                    $action = app(DeleteCustomFieldAction::class);
+
+                    foreach ($ids as $id) {
+                        $action->run($id);
+                    }
+                    break;
+                case 1:
+                case 0:
+                    $action = app(UpdateCustomFieldAction::class);
+
+                    foreach ($ids as $id) {
+                        $action->run($id, [
+                            'status' => $actionValue,
+                        ]);
+                    }
+                    break;
+                default:
+                    return [
+                        'customActionMessage' => trans('webed-core::errors.' . \Constants::METHOD_NOT_ALLOWED . '.message'),
+                        'customActionStatus' => 'danger'
+                    ];
+                    break;
+            }
+            $data['customActionMessage'] = trans('webed-core::base.form.request_completed');
+            $data['customActionStatus'] = 'success';
+        }
+        return $data;
     }
 }
