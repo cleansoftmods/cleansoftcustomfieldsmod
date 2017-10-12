@@ -1,3 +1,5 @@
+import {WebEd} from "../../../../../../../base/resources/assets/js/Helpers/WebEd";
+
 class UseCustomFields {
     constructor() {
         this.$body = $('body');
@@ -46,9 +48,8 @@ class UseCustomFields {
         };
 
         let initWYSIWYG = function ($element, type) {
-            "use strict";
             WebEd.wysiwyg($element, {
-                toolbar: 'basic'
+                toolbar: type
             });
             return $element;
         };
@@ -61,9 +62,17 @@ class UseCustomFields {
                 skeleton = skeleton.replace(/__instructions__/gi, box.instructions || '');
 
                 let $skeleton = $(skeleton);
-                $skeleton.find('.meta-box-wrap').append(registerLine(box));
+                let $data = registerLine(box);
+
+                $skeleton.find('.meta-box-wrap').append($data);
+
                 $skeleton.data('lcf-registered-data', box);
+
                 $appendTo.append($skeleton);
+
+                if (box.type === 'wysiwyg') {
+                    initWYSIWYG($skeleton.find('.meta-box-wrap .wysiwyg-editor'), box.options.wysiwygToolbar || 'basic');
+                }
             });
         };
 
@@ -151,8 +160,10 @@ class UseCustomFields {
                     break;
                 case 'wysiwyg': {
                     result = result.replace(/__value__/gi, box.value || '');
+
                     let $result = $(result);
-                    return initWYSIWYG($result, box.options.wysiwygToolbar || 'basic');
+
+                    $result.attr('data-toolbar', box.options.wysiwygToolbar || 'basic');
                 }
                     break;
             }
@@ -186,10 +197,15 @@ class UseCustomFields {
                 result = result.replace(/__instructions__/gi, item.instructions || '');
 
                 let $result = $(result);
+                let $data = registerLine(item);
                 $result.data('lcf-registered-data', item);
-                $result.find('> .repeater-item-input').append(registerLine(item));
+                $result.find('> .repeater-item-input').append($data);
 
                 $appendTo.append($result);
+
+                if (item.type === 'wysiwyg') {
+                    initWYSIWYG($result.find('> .repeater-item-input .wysiwyg-editor'), item.options.wysiwygToolbar || 'basic');
+                }
             });
             return $appendTo;
         };
@@ -348,6 +364,8 @@ class UseCustomFields {
                     customFieldData.value = $item.find('> .repeater-item-input input').val();
                     break;
                 case 'wysiwyg':
+                    customFieldData.value = WebEd.wysiwygGetContent($item.find('> .repeater-item-input > .lcf-wysiwyg-wrapper > .wysiwyg-editor'));
+                    break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .repeater-item-input textarea').val();
                     break;

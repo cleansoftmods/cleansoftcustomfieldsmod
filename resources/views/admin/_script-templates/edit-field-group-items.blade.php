@@ -164,7 +164,7 @@
                 </div>
                 <div class="col-xs-9">
                     <h5>{!! trans('webed-custom-fields::base.form.field_type') !!}</h5>
-                    <select name="" class="form-control change-field-type">
+                    <select class="form-control change-field-type">
                         <optgroup label="{{ trans('webed-custom-fields::base.form.groups.basic') }}">
                             <option value="text" selected="selected">{{ trans('webed-custom-fields::base.form.types.text') }}</option>
                             <option value="textarea">{{ trans('webed-custom-fields::base.form.types.textarea') }}</option>

@@ -24,7 +24,6 @@ class ManageCustomFields {
         let _self = this;
 
         let CURRENT_RULES = $.parseJSON($('#custom_fields_rules').val());
-        console.log(CURRENT_RULES);
         let $_GLOBAL_TEMPLATE = $(_self.RULES_GROUP_TEMPLATE_HTML),
             LINE_GROUP_TEMPLATE = $('#rules_line_group_template').html(),
             $_GROUP_CONTAINER = $('.line-group-container');

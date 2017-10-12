@@ -77,6 +77,10 @@ class CustomFieldSupport
             'data' => []
         ];
 
+        if (!is_array($data)) {
+            $data = [$data];
+        }
+
         $this->ruleGroups[$group]['items'][$slug]['data'] = $data;
 
         return $this;
@@ -112,9 +116,20 @@ class CustomFieldSupport
     {
         foreach ($this->ruleGroups as $groupKey => &$group) {
             foreach ($group['items'] as $type => &$item) {
-                if ($item['data'] instanceof \Closure) {
-                    $item['data'] = call_user_func($item['data']);
+                $data = [];
+
+                foreach ($item['data'] as $datum) {
+                    if ($datum instanceof \Closure) {
+                        $resolvedClosure = call_user_func($datum);
+                        if (is_array($resolvedClosure)) {
+                            $data = array_unique(array_merge($data, $resolvedClosure));
+                        }
+                    } elseif (is_array($datum)) {
+                        $data = array_unique(array_merge($data, $datum));
+                    }
                 }
+
+                $item['data'] = $data;
             }
         }
 

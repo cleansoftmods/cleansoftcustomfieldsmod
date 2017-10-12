@@ -83,7 +83,7 @@ class FieldItemRepository extends EloquentBaseRepository implements FieldItemRep
     {
         $isExist = $this->findWhere([
             'slug' => $slug,
-            'field_group_id' => $fieldGroupId,
+            //'field_group_id' => $fieldGroupId,
             'parent_id' => $parentId
         ]);
         if ($isExist && (int)$id != (int)$isExist->id) {
