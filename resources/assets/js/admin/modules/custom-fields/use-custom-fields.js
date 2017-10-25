@@ -312,6 +312,8 @@ class UseCustomFields {
                     customFieldData.value = $item.find('> .meta-box-wrap input').val();
                     break;
                 case 'wysiwyg':
+                    customFieldData.value = WebEd.wysiwygGetContent($item.find('> .meta-box-wrap textarea'));
+                    break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .meta-box-wrap textarea').val();
                     break;
