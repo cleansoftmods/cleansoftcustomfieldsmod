@@ -59,6 +59,19 @@ class CustomFieldSupport
     }
 
     /**
+     * @param $groupName
+     * @return $this
+     */
+    public function expandRuleGroup($groupName)
+    {
+        if(!isset($this->ruleGroups[$groupName])) {
+            return $this->registerRuleGroup($groupName);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $group
      * @param string $title
      * @param string $slug
@@ -122,10 +135,14 @@ class CustomFieldSupport
                     if ($datum instanceof \Closure) {
                         $resolvedClosure = call_user_func($datum);
                         if (is_array($resolvedClosure)) {
-                            $data = array_unique(array_merge($data, $resolvedClosure));
+                            foreach ($resolvedClosure as $key => $value) {
+                                $data[$key] = $value;
+                            }
                         }
                     } elseif (is_array($datum)) {
-                        $data = array_unique(array_merge($data, $datum));
+                        foreach ($datum as $key => $value) {
+                            $data[$key] = $value;
+                        }
                     }
                 }
 
