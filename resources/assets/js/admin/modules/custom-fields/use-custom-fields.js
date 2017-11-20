@@ -310,12 +310,16 @@ class UseCustomFields {
                 case 'image':
                 case 'file':
                     customFieldData.value = $item.find('> .meta-box-wrap input').val();
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'wysiwyg':
                     customFieldData.value = WebEd.wysiwygGetContent($item.find('> .meta-box-wrap textarea'));
                     break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .meta-box-wrap textarea').val();
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'checkbox':
                     customFieldData.value = [];
@@ -364,12 +368,16 @@ class UseCustomFields {
                 case 'image':
                 case 'file':
                     customFieldData.value = $item.find('> .repeater-item-input input').val();
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'wysiwyg':
                     customFieldData.value = WebEd.wysiwygGetContent($item.find('> .repeater-item-input > .lcf-wysiwyg-wrapper > .wysiwyg-editor'));
                     break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .repeater-item-input textarea').val();
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'checkbox':
                     customFieldData.value = [];
