@@ -15,6 +15,8 @@ class UseCustomFields {
 
         this.CURRENT_DATA = Helpers.jsonDecode(this.$_EXPORT_TO.val(), []);
 
+        console.log(this.$_EXPORT_TO.val());
+
         if (this.CURRENT_DATA) {
             this.handleCustomFields();
             this.exportData();
@@ -315,6 +317,8 @@ class UseCustomFields {
                     break;
                 case 'wysiwyg':
                     customFieldData.value = WebEd.wysiwygGetContent($item.find('> .meta-box-wrap textarea'));
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .meta-box-wrap textarea').val();
@@ -373,6 +377,8 @@ class UseCustomFields {
                     break;
                 case 'wysiwyg':
                     customFieldData.value = WebEd.wysiwygGetContent($item.find('> .repeater-item-input > .lcf-wysiwyg-wrapper > .wysiwyg-editor'));
+                    customFieldData.value = customFieldData.value
+                        .replace(/"/gi, "''");
                     break;
                 case 'textarea':
                     customFieldData.value = $item.find('> .repeater-item-input textarea').val();
